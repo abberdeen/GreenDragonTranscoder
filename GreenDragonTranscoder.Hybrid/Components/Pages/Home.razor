@@ -1,0 +1,86 @@
+﻿@page "/"
+@*
+<MudToolBar>
+    <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
+
+
+    <MudIconButton Icon="@Icons.Material.Outlined.Add" />
+    <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+    <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
+    <MudIconButton Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
+    
+    <MudSpacer />
+
+     <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
+    <MudIconButton Icon="@Icons.Material.Outlined.PushPin" />
+    <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" />
+
+    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />  
+</MudToolBar>
+*@
+<MudStack Row="true" Class="pl-6 pr-6 pt-6" Style="width:100%;">
+
+    <MudPaper Style="min-width: 300px; width: 300px;">
+
+        <MudListSubheader Class="pb-4">
+            <MudStack Row="true"
+                      Justify="Justify.SpaceBetween"
+                      AlignItems="AlignItems.Center">
+
+                Projects
+
+                <MudIconButton Icon="@Icons.Material.Filled.Add"
+                               Size="Size.Small"
+                               Color="Color.Primary"
+                               aria-label="github"></MudIconButton>
+            </MudStack>
+
+        </MudListSubheader>
+
+        <MudTextField Clearable="true"
+                      T="string"
+                      Label="Search"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Margin="Margin.Dense"
+                      FullWidth="false"
+                      Class="mr-3 ml-3 mb-6" />
+        <div class="d-flex flex-column overflow-x-auto " style="width:100%;height: calc(100vh - 190px);">
+
+            <MudList Clickable="true"
+                     Color="Color.Primary"
+                     Dense="false"
+                     DisableGutters="false"
+                     @bind-SelectedItem="selectedItem"
+                     @bind-SelectedValue="selectedValue"
+                     Class="ma-0 pa-0">
+
+                <MudListItem Value="1" Text="Vanilla Sky" Avatar="@Icons.Material.Filled.Movie"  />
+
+                <MudListItem Value="2" Text="Murder Mystery 2" Avatar="@Icons.Material.Filled.Movie" />
+
+                @for (int i = 1; i < 15; i++)
+                {
+                    <MudListItem Value="@(i+2)" Text="@($"The Out-Laws {@i}")" Avatar="@Icons.Material.Filled.Movie" />
+                }
+            </MudList>
+        </div>
+    </MudPaper>
+
+    <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 mr-">xs=6</MudPaper>
+
+</MudStack>
+
+<MudPaper Style="position:fixed; bottom:0; left:0; width:100%;"
+          Class="pa-2 pl-6"
+          Elevation="2">
+    This is footer
+</MudPaper>
+
+
+@code {
+    MudListItem selectedItem;
+    object selectedValue = 1;
+    Color _color = Color.Primary;
+}
