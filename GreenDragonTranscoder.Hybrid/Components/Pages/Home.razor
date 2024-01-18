@@ -1,4 +1,8 @@
 ﻿@page "/"
+@using GreenDragonTranscoder.Core.Services
+@using GreenDragonTranscoder.Core.Services.SlateService
+@using GreenDragonTranscoder.Hybrid.Helpers
+@using System.Diagnostics
 @*
 <MudToolBar>
     <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
@@ -232,7 +236,7 @@
 <MudPaper Style="position:fixed; bottom:0; left:0; width:100%;"
           Class="pa-2 pl-6"
           Elevation="2">
-    This is footer
+    This is footer. @(t.Elapsed)
 </MudPaper>
 
 
@@ -246,6 +250,9 @@
     bool running = false;
     public record Employee(string Name, string Position, int YearsEmployed, int Salary, int Rating);
     public IEnumerable<ProjectOutput> projectOutputs;
+
+    Stopwatch t = new Stopwatch();
+
 
     protected override void OnInitialized()
     {
@@ -264,7 +271,39 @@
             new ProjectOutput("h265", "25 fps", 0, false),
             new ProjectOutput("h265", "25 fps", 0, false),
             new ProjectOutput("h265", "25 fps", 0, false),
-        }; 
+        };
+
+        var slateOptions = new SlateOptions()
+            {
+                SlateInfo = new SlateInfo()
+                {
+                    Title = "Vanilla Sky",
+                    Slate = "VSK_103_101_123",
+                    Date ="19/01/2024",
+                    Shot = "VSK_103_101_123_v001",
+                    Frames = "1023374-101323",
+                    Artist = "Abba",
+                    FPS = "23.976",
+                    FileType = "EXR/H264",
+                    FrameSize = "1920x1080",
+                    Description = "Some description"
+                }
+            };
+
+        t.Start();
+
+       
+        slateOptions.SlateBackgroundPath = Path.Combine(FileService.AppDataPath, "4k_slate_background.tif");
+        slateOptions.SlateDrawingConfigPath = Path.Combine(FileService.AppDataPath, "slateDrawingConfig.json");
+        slateOptions.FontFile = Path.Combine(FileService.AppDataPath, "Castoro-Regular.ttf");
+
+        var tmpDirectory = Path.Combine(FileService.AppPath, "data");
+        Directory.CreateDirectory(tmpDirectory);
+        var slateSavePath = Path.Combine(tmpDirectory, $"slate.png");
+
+        SlateService.CreateSlate(slateOptions, slateSavePath);
+
+        t.Stop();
     }
 
     public int Value { get; set; }

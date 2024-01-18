@@ -19,8 +19,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="BitMiracle.LibTiff.NET" Version="2.4.649" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+		<PackageReference Include="SkiaSharp" Version="2.88.7" />
+		<PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.7" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.7" />
 	</ItemGroup>
 
 </Project>
