@@ -68,7 +68,7 @@ namespace GreenDragonTranscoder.Test
             string validCDLInput = "<CDL><Slope>1 1 1</Slope><Offset>0 0 0</Offset><Power>1 1 1</Power><Saturation>0.5</Saturation></CDL>";
 
             // Act
-            CDLParameters result = CDLHelper.ParseCDLParameters(validCDLInput);
+            CDLParameters result = CDLHelper.ParseXmlCDLParameters(validCDLInput);
 
             // Assert
             Assert.NotNull(result);
@@ -94,7 +94,7 @@ namespace GreenDragonTranscoder.Test
             Assert.Throws<ArgumentException>(() =>
             {
                 // Act
-                CDLParameters result = CDLHelper.ParseCDLParameters(invalidCDLInput);
+                CDLParameters result = CDLHelper.ParseXmlCDLParameters(invalidCDLInput);
             });
         }
 

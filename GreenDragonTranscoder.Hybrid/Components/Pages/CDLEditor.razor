@@ -1,0 +1,94 @@
+﻿@using GreenDragonTranscoder.CoreLib.Services.CDLService
+@inject ISnackbar Snackbar
+<MudText>Three-Way CDL Editing with 'Edit Any, Change All' </MudText>
+<MudButton Size="Size.Small" StartIcon="Clear" Variant="Variant.Text" OnClick="ClearAll">Clear All</MudButton>
+<MudStack Row="true" Justify="Justify.FlexStart" Spacing="6" AlignItems="AlignItems.Start" Style="width: 100%">
+    <MudPaper Class="pa-4" Outlined="true" Style="height:100%; width: 100%;">
+        <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Start">
+            <MudStack Row="true" AlignItems="AlignItems.End" Spacing="6">
+                <MudText Align="Align.Right" Style="width: 100px;">Slope</MudText>
+                <MudNumericField Value="cdl.Slope.Red" ValueChanged="@((e)=> { cdl.Slope.Red = e; UpdateState("param");})" Label="Red" Variant="Variant.Text" Min="0.00f" Max="200.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+                <MudNumericField Value="cdl.Slope.Green" ValueChanged="@((e)=> { cdl.Slope.Green = e; UpdateState("param");})" Label="Green" Variant="Variant.Text" Min="0.00f" Max="200.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+                <MudNumericField Value="cdl.Slope.Blue" ValueChanged="@((e)=> { cdl.Slope.Blue = e; UpdateState("param");})" Label="Blue" Variant="Variant.Text" Min="0.00f" Max="200.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+            </MudStack>
+
+            <MudStack Row="true" AlignItems="AlignItems.End" Spacing="6" Class="mt-2">
+                <MudText Align="Align.Right" Style="width: 100px;">Offset</MudText>
+                <MudNumericField Value="cdl.Offset.Red" ValueChanged="@((e)=> { cdl.Offset.Red = e; UpdateState("param");})" Label="Red" Variant="Variant.Text" Min="-100.00f" Max="100.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+                <MudNumericField Value="cdl.Offset.Green" ValueChanged="@((e)=> { cdl.Offset.Green = e; UpdateState("param");})" Label="Green" Variant="Variant.Text" Min="-100.00f" Max="100.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+                <MudNumericField Value="cdl.Offset.Blue" ValueChanged="@((e)=> { cdl.Offset.Blue = e; UpdateState("param");})" Label="Blue" Variant="Variant.Text" Min="-100.00f" Max="100.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+            </MudStack>
+
+            <MudStack Row="true" AlignItems="AlignItems.End" Spacing="6" Class="mt-2">
+                <MudText Align="Align.Right" Style="width: 100px;">Power</MudText>
+                <MudNumericField Value="cdl.Power.Red" ValueChanged="@((e)=> { cdl.Power.Red = e; UpdateState("param");})" Label="Red" Variant="Variant.Text" Min="0.00f" Max="400.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+                <MudNumericField Value="cdl.Power.Green" ValueChanged="@((e)=> { cdl.Power.Green = e; UpdateState("param");})" Label="Green" Variant="Variant.Text" Min="0.00f" Max="400.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+                <MudNumericField Value="cdl.Power.Blue" ValueChanged="@((e)=> { cdl.Power.Blue = e; UpdateState("param");})" Label="Blue" Variant="Variant.Text" Min="0.00f" Max="400.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+            </MudStack>
+
+            <MudStack Row="true" AlignItems="AlignItems.End" Spacing="6" Class="mt-2">
+                <MudText Align="Align.Right" Style="width: 100px;">Saturation</MudText>
+                <MudNumericField Value="cdl.Saturation" ValueChanged="@((e)=> { cdl.Saturation= e; UpdateState("param");})" Label="Value" Variant="Variant.Text" Min="0.00f" Max="400.00f" Step="0.10f" Format="F6" Style="width: 100px;" T="@(float)" />
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Class="pa-4 pt-0" Outlined="true" Style="height:100%; width: 100%;">
+        <MudTextField Immediate="true" Value="@cdlXml" ValueChanged="@((e)=> { cdlXml = e; UpdateState("CDL-XML");})" T="string" Label="CDL XML (Edit or Copy)" Variant="Variant.Text" Lines="14" Style="height:100%; width: 100%;" />
+    </MudPaper>
+</MudStack>
+<MudStack Row="true" AlignItems="AlignItems.End" Spacing="6" Class="mt-2" Style="width:100%;">
+    <MudTextField Immediate="true" Value="@cdlInline" ValueChanged="@((e)=> { cdlInline = e; UpdateState("CDL-Inline");})" T="string" Label="CDL Inline (Edit or Copy)" Variant="Variant.Outlined" Lines="1" />
+</MudStack>
+<MudStack Row="true" AlignItems="AlignItems.End" Spacing="6" Class="mt-2" Style="width:100%;">
+    <MudTextField ReadOnly="true" Value="@geqFilterV1" T="string" Label="GEQ Filter V1 (Readonly)" Variant="Variant.Outlined" Lines="1" />
+</MudStack>
+
+@code {
+    string cdlXml;
+    string cdlInline;
+    string geqFilterV1;
+    CDLParameters cdl = new CDLParameters();
+
+    void ClearAll() 
+    {
+        cdlXml = null;
+        cdlInline = null;
+        cdl = new();
+        geqFilterV1 = null;
+    }
+
+    void UpdateState(string handler)
+    {
+        try
+        {
+            if (handler == "CDL-XML")
+            {
+                if (!string.IsNullOrEmpty(cdlXml?.Trim()))
+                {
+                    cdl = CDLHelper.ParseXmlCDLParameters(cdlXml);
+                    cdlInline = CDLHelper.ConvertToInlineCDL(cdl);
+                    Snackbar.Add("Updated values from " + handler, Severity.Info); 
+                }
+            }
+            else if (handler == "param")
+            {
+                cdlXml = CDLHelper.ConvertToXmlCDL(cdl);
+                cdlInline = CDLHelper.ConvertToInlineCDL(cdl);
+            }
+            else if (handler == "CDL-Inline")
+            {
+                cdl = CDLHelper.ParseInlineCDLParameters(cdlInline);
+                cdlXml = CDLHelper.ConvertToXmlCDL(cdl);
+                Snackbar.Add("Updated values from " + handler, Severity.Info);
+
+            } 
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Warning);
+        }
+        geqFilterV1 = CDLHelper.ConvertCDLToGECFilterV1(cdl);
+        StateHasChanged();
+    }
+}

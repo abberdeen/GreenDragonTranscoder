@@ -1,14 +1,13 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using static GreenDragonTranscoder.CoreLib.Services.CDLService.CDLParameters;
-
 namespace GreenDragonTranscoder.CoreLib.Services.CDLService
 {
     public static class CDLHelper
     {
         public static string ConvertCDLToGECFilterV1(string cdlInput)
         {
-            var cdlParamers = ParseCDLParameters(cdlInput);
+            var cdlParamers = ParseXmlCDLParameters(cdlInput);
 
             if (cdlParamers == null)
             {
@@ -47,11 +46,15 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
             string bO = cdl.Offset.Blue.ToString(culture);  // blueOffset
             string bP = cdl.Power.Blue.ToString(culture);  // bluePower
 
-            // Adjust the sign of the offset based on its sign
+            // Adjust the sign of the offset based on its sign.
+            // Offset (any number, nominal value is 0)
             string operatorRSO = cdl.Offset.Red < 0 ? "" : "+";
             string operatorGSO = cdl.Offset.Green < 0 ? "" : "+";
             string operatorBSO = cdl.Offset.Blue < 0 ? "" : "+";
 
+            // https://docs.red.com/955-0196_v1.6/Content/4_Menus/Image_LUT/CDL/01_Intro_CDL.htm
+            // The formula for ASC CDL color correction: pow((r(X,Y))*{rS}{operatorRSO}{rO},{rP})
+            //
             // https://ffmpeg.org/ffmpeg-filters.html#geq
             var geqFilter = $"geq=\\\n" +
                      $"r='pow((r(X,Y))*{rS}{operatorRSO}{rO},{rP})+({sVC})*({wR}*r(X,Y)+{wG}*g(X,Y)+{wB}*b(X,Y))*{sV}':\\\n" +
@@ -61,7 +64,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
             return geqFilter;
         }
 
-        public static CDLParameters ParseCDLParameters(string cdlInput)
+        public static CDLParameters ParseXmlCDLParameters(string cdlInput)
         {
             var patterns = new[]
             {
@@ -98,7 +101,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
             {
               @"\((.*?)\)",
               @"(\d+\.\d+)"
-          };
+            };
 
             var matches = patterns.SelectMany(pattern => Regex.Matches(cdlInput, pattern, RegexOptions.IgnoreCase)
                                                                 .Cast<Match>()
@@ -133,6 +136,55 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
                 Power = new ColorAdjustment(powerArray[0], powerArray[1], powerArray[2]),
                 Saturation = saturationValue
             };
+        }
+
+        public static string ConvertToXmlCDL(CDLParameters cdl)
+        {
+            // XML template string
+            string xmlTemplate = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<ColorDecisionList xmlns=""urn:ASC:CDL:v1.01"">
+    <ColorDecision>
+        <ColorCorrection>
+            <SOPNode>
+                <Description />
+                <Slope>{0} {1} {2}</Slope>
+                <Offset>{3} {4} {5}</Offset>
+                <Power>{6} {7} {8}</Power>
+            </SOPNode>
+            <SATNode>
+                <Saturation>{9}</Saturation>
+            </SATNode>
+        </ColorCorrection>
+    </ColorDecision>
+</ColorDecisionList>";
+
+            return FormatOutput(xmlTemplate, cdl);
+        }
+
+        public static string ConvertToInlineCDL(CDLParameters cdl)
+        {
+            // inline template string
+            string inlineTemplate = @"({0}, {1}, {2})({3}, {4}, {5})({6}, {7}, {8}){9}";
+
+            return FormatOutput(inlineTemplate, cdl);
+        }
+
+        private static string FormatOutput(string template, CDLParameters cdl) 
+        {
+            // Replace placeholders with actual values, using InvariantCulture for dot as decimal separator
+            string ouput = string.Format(CultureInfo.InvariantCulture, template,
+                cdl.Slope.Red.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Slope.Green.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Slope.Blue.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Offset.Red.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Offset.Green.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Offset.Blue.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Power.Red.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Power.Green.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Power.Blue.ToString("F6", CultureInfo.InvariantCulture),
+                cdl.Saturation.ToString("F6", CultureInfo.InvariantCulture));
+
+            return ouput;
         }
     }
 }
