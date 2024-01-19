@@ -6,12 +6,23 @@ namespace GreenDragonTranscoder.CoreLib.Services.SlateService
 {
     internal class TiffHelper
     {
-        // Convert a TIFF stream to a SKBitmap
-        public static SKBitmap DecodeTiff(string filePath)
+        public static SKBitmap? DecodeTiff(string filePath)
         {
             // open a TIFF stored in the stream
             using var tifImg = Tiff.Open(filePath, "r");
+            return _DecodeTiff(tifImg);
+        }
 
+        public static SKBitmap? DecodeTiff(Stream tiffStream)
+        {
+            // open a TIFF stored in the stream
+            using Tiff tifImg = Tiff.ClientOpen("in-memory", "r", tiffStream, new TiffStream());
+            return _DecodeTiff(tifImg);
+        }
+
+        // Convert a TIFF stream to a SKBitmap
+        private static SKBitmap? _DecodeTiff(Tiff? tifImg)
+        { 
             if (tifImg == null)
             {
                 // Handle error: Unable to open the TIFF file

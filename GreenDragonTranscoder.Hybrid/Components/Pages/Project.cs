@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GreenDragonTranscoder.Hybrid.Properties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ namespace GreenDragonTranscoder.Hybrid.Components.Pages
         public Project(int id, string name)
         {
             Id = id;
-            Name = name;
+            Name = name; 
         }
     }
 

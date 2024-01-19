@@ -12,23 +12,39 @@ namespace GreenDragonTranscoder.CoreLib.Services.SlateService
         {
             ValidateOptions(options);
 
-            using var backgroundBitmap = TiffHelper.DecodeTiff(options.SlateBackgroundPath);
+            if (options.SlateBackground == null)
+            {
+                throw new ArgumentNullException(nameof(options.SlateBackground));   
+            }
+
+            using var backgroundBitmap = TiffHelper.DecodeTiff(options.SlateBackground);
+
+            if (backgroundBitmap == null) 
+            {
+                throw new Exception("Couldn't decode tiff file.");
+            }
+
             using var surface = SKSurface.Create(new SKImageInfo(backgroundBitmap.Width, backgroundBitmap.Height));
             var canvas = surface.Canvas;
 
             canvas.DrawBitmap(backgroundBitmap, 0, 0);
 
-            var font = SKTypeface.FromFile(options.FontFile);
+            var font = SKTypeface.FromStream(options.FontFile);
             var textPaint = CreateTextPaint(font);
 
-            var drawingConfig = LoadDrawingConfig(options.SlateDrawingConfigPath);
+            var drawingConfig = LoadDrawingConfig(options.SlateDrawingConfig);
+
+            if (drawingConfig == null) 
+            {
+                throw new Exception("Invalid slate drawing config.");
+            }
 
             foreach (var property in typeof(SlateInfo).GetProperties())
             {
                 string propertyName = property.Name.ToLower();
-                object propertyValue = property.GetValue(options.SlateInfo);
+                object? propertyValue = property?.GetValue(options.SlateInfo);
 
-                if (drawingConfig.TryGetValue(propertyName, out TextPositionsConfig textConfig) && textConfig != null)
+                if (drawingConfig.TryGetValue(propertyName, out TextPositionsConfig? textConfig) && textConfig != null)
                 {
                     if (propertyName == "title")
                     {
@@ -47,12 +63,12 @@ namespace GreenDragonTranscoder.CoreLib.Services.SlateService
 
         private static void ValidateOptions(SlateOptions options)
         {
-            if (options.SlateInfo == null || string.IsNullOrEmpty(options.SlateBackgroundPath) || !File.Exists(options.SlateBackgroundPath))
+            if (options.SlateInfo == null || options.SlateBackground == null)
             {
                 throw new ArgumentException("Invalid input parameters or background image file does not exist.");
             }
 
-            if (string.IsNullOrEmpty(options.SlateDrawingConfigPath) || !File.Exists(options.SlateDrawingConfigPath))
+            if (options.SlateDrawingConfig == null)
             {
                 throw new ArgumentException("Invalid input parameters or slateDrawingConfig file does not exist.");
             }
@@ -86,18 +102,30 @@ namespace GreenDragonTranscoder.CoreLib.Services.SlateService
             }
         }
 
-        private static Dictionary<string, TextPositionsConfig> LoadDrawingConfig(string configFilePath)
+        private static Dictionary<string, TextPositionsConfig>? LoadDrawingConfig(Stream? configFile)
         {
+            if (configFile == null)
+            {
+                // Handle the case where the stream is null
+                return null;
+            }
+
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
             };
 
-            string json = File.ReadAllText(configFilePath);
+            using (var streamReader = new StreamReader(configFile))
+            {
+                // Read the JSON content from the stream
+                string json = streamReader.ReadToEnd();
 
-            var config = JsonSerializer.Deserialize<Dictionary<string, TextPositionsConfig>>(json, options);
+                // Deserialize the JSON content into a Dictionary
+                var config = JsonSerializer.Deserialize<Dictionary<string, TextPositionsConfig>>(json, options);
 
-            return config?.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
+                // Convert the keys to lowercase and return the result
+                return config?.ToDictionary(kvp => kvp.Key.ToLower(), kvp => kvp.Value);
+            }
         }
     }
 }

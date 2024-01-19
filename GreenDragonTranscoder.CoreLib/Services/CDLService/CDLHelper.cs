@@ -5,7 +5,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
 {
     public static class CDLHelper
     {
-        public static string ConvertCDLToGECFilterV1(string cdlInput)
+        public static string? ConvertCDLToGECFilterV1(string cdlInput)
         {
             var cdlParamers = ParseXmlCDLParameters(cdlInput);
 
@@ -19,7 +19,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
             return gecFilter;
         }
 
-        public static string ConvertCDLToGECFilterV1(CDLParameters cdl)
+        public static string? ConvertCDLToGECFilterV1(CDLParameters cdl)
         {
             if (cdl == null)
             {

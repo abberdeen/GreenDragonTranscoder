@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GreenDragonTranscoder.Hybrid.Properties;
+using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 
 namespace GreenDragonTranscoder.Hybrid
@@ -6,7 +7,7 @@ namespace GreenDragonTranscoder.Hybrid
     public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
-        {
+        { 
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()

@@ -22,10 +22,10 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>GreenDragonTranscoder.Hybrid</ApplicationTitle>
+        <ApplicationTitle>Green Dragon Transcoder</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.greendragontranscoder.hybrid</ApplicationId>
+        <ApplicationId>com.pulodian.greendragontranscoder.hybrid</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -46,6 +46,7 @@
         <AppInstallerUri>https://dist.gdt.pulodian.net/</AppInstallerUri>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
         <PackageCertificateThumbprint>C74F18DF62D16A1CD54AED7C4649981279ED3BE5</PackageCertificateThumbprint>
+        <Title>Green Dragon Transcoder</Title>
     </PropertyGroup>
 
     <ItemGroup>
@@ -57,13 +58,22 @@
 
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
-        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" /> 
 
         <!-- Custom Fonts -->
         <MauiFont Include="Resources\Fonts\*" />
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Resources\Raw\slateDrawingConfig.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\Raw\Castoro-Regular.ttf" />
+      <None Remove="Resources\Raw\slate_background.tif" />
     </ItemGroup>
 
     <ItemGroup>
@@ -79,21 +89,28 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="data\slateDrawingConfig.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+      <Compile Update="Properties\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="data\4k_slate_background.tif">
+      <EmbeddedResource Update="Properties\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Resources\Data\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiAsset Update="Resources\Raw\AboutAssets.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\Castoro-Regular.ttf">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="data\JosefinSans-VariableFont_wght.ttf">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+      </MauiAsset>
     </ItemGroup>
 
 </Project>

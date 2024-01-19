@@ -45,9 +45,9 @@
 </MudStack>
 
 @code {
-    string cdlXml;
-    string cdlInline;
-    string geqFilterV1;
+    string? cdlXml;
+    string? cdlInline;
+    string? geqFilterV1;
     CDLParameters cdl = new CDLParameters();
 
     void ClearAll() 
@@ -78,7 +78,7 @@
             }
             else if (handler == "CDL-Inline")
             {
-                cdl = CDLHelper.ParseInlineCDLParameters(cdlInline);
+                cdl = CDLHelper.ParseInlineCDLParameters(cdlInline ?? "");
                 cdlXml = CDLHelper.ConvertToXmlCDL(cdl);
                 Snackbar.Add("Updated values from " + handler, Severity.Info);
 
