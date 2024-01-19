@@ -1,4 +1,4 @@
-﻿namespace GreenDragonTranscoder.Core.Services.SlateService
+﻿namespace GreenDragonTranscoder.CoreLib.Services.SlateService
 {
     public class SlateInfo
     { 

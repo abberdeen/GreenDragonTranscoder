@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GreenDragonTranscoder.Core.Services.SlateService
+namespace GreenDragonTranscoder.CoreLib.Services.SlateService
 {
     public class TextPositionsConfig
     {

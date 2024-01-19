@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenDragonTranscoder.Core", "GreenDragonTranscoder.Core\GreenDragonTranscoder.Core.csproj", "{44AFA52C-FACC-469A-8415-18EB80D27E39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GreenDragonTranscoder.Hybrid", "GreenDragonTranscoder.Hybrid\GreenDragonTranscoder.Hybrid.csproj", "{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenDragonTranscoder.Hybrid", "GreenDragonTranscoder.Hybrid\GreenDragonTranscoder.Hybrid.csproj", "{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenDragonTranscoder.Test", "GreenDragonTranscoder.Test\GreenDragonTranscoder.Test.csproj", "{075BE0A9-29E3-41FC-B64F-7F936095BD04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenDragonTranscoder.CoreLib", "GreenDragonTranscoder.CoreLib\GreenDragonTranscoder.CoreLib.csproj", "{FE4A1894-ACEF-409A-837D-0B10141531E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,16 +15,20 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{44AFA52C-FACC-469A-8415-18EB80D27E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44AFA52C-FACC-469A-8415-18EB80D27E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44AFA52C-FACC-469A-8415-18EB80D27E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44AFA52C-FACC-469A-8415-18EB80D27E39}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C05D046C-5F0D-4888-B8C5-39E5FE7E67F8}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{075BE0A9-29E3-41FC-B64F-7F936095BD04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{075BE0A9-29E3-41FC-B64F-7F936095BD04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{075BE0A9-29E3-41FC-B64F-7F936095BD04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{075BE0A9-29E3-41FC-B64F-7F936095BD04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

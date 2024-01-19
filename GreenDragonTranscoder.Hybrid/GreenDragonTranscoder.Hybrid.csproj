@@ -75,7 +75,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GreenDragonTranscoder.Core\GreenDragonTranscoder.Core.csproj" />
+      <ProjectReference Include="..\GreenDragonTranscoder.CoreLib\GreenDragonTranscoder.CoreLib.csproj" />
     </ItemGroup>
 
     <ItemGroup>

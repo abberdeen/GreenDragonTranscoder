@@ -8,9 +8,11 @@ namespace GreenDragonTranscoder.Hybrid.Components.Pages
 {
     public class Project
     {
+        public int Id { get; set; }
         public string Name { get; set; }
-        public Project(string name)
+        public Project(int id, string name)
         {
+            Id = id;
             Name = name;
         }
     }

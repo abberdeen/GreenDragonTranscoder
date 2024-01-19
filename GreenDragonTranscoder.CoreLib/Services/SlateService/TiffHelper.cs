@@ -2,7 +2,7 @@
 using SkiaSharp;
 using System.Runtime.InteropServices;
 
-namespace GreenDragonTranscoder.Core.Services.SlateService
+namespace GreenDragonTranscoder.CoreLib.Services.SlateService
 {
     internal class TiffHelper
     {

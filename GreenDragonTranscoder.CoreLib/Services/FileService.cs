@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GreenDragonTranscoder.Core.Services
+namespace GreenDragonTranscoder.CoreLib.Services
 {
     public static class FileService
     {

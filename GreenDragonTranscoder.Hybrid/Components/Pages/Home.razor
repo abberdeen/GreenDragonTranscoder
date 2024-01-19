@@ -1,6 +1,6 @@
-﻿@page "/"
-@using GreenDragonTranscoder.Core.Services
-@using GreenDragonTranscoder.Core.Services.SlateService
+﻿@page "/" 
+@using GreenDragonTranscoder.CoreLib.Services
+@using GreenDragonTranscoder.CoreLib.Services.SlateService
 @using GreenDragonTranscoder.Hybrid.Helpers
 @using System.Diagnostics
 @*
@@ -30,9 +30,11 @@
                 </MudIconButton>
             </MudStack>
         </MudListSubheader>
-
         <MudTextField Clearable="true"
+                      @bind-Value="@searchProject"
+                      Immediate="true"
                       T="string"
+                      OnKeyDown="@((e)=> filteredProjects = projects.Where(x=>x.Name.Contains(searchProject?? string.Empty, StringComparison.InvariantCultureIgnoreCase)))"
                       Label="Search"
                       Variant="Variant.Outlined"
                       Adornment="Adornment.End"
@@ -45,24 +47,20 @@
             <MudList Clickable="true"
                      Color="Color.Primary"
                      Dense="false"
-                     DisableGutters="false"
+                     DisableGutters="false" 
                      @bind-SelectedItem="selectedItem"
                      @bind-SelectedValue="selectedValue"
                      Class="ma-0 pa-0">
-
-                <MudListItem Value="1" Text="Vanilla Sky" Avatar="@Icons.Material.Filled.Movie" />
-                <MudListItem Value="2" Text="Murder Mystery 2" Avatar="@Icons.Material.Filled.Movie" />
-
-                @for (int i = 1; i < 15; i++)
-                {
-                    <MudListItem Value="@(i+2)" Text="@($"The Out-Laws {@i}")" Avatar="@Icons.Material.Filled.Movie" />
+                @foreach (var item in filteredProjects)
+                { 
+                    <MudListItem Value="@item.Id" Text="@item.Name" Avatar="@Icons.Material.Filled.Movie" />
                 }
             </MudList>
         </div>
     </MudPaper>
 
     <MudPaper Class="mud-width-full" Style="width:100%;min-width:680px;">
-        @if (1 == 0)
+        @if (selectedValue == null || (int)selectedValue == 0)
         {
             <div class="d-flex flex-column overflow-x-auto align-center justify-center" style="width:100%;height: 100%;">
                 <span>Choose a project from the list to begin.</span>
@@ -73,7 +71,7 @@
             <MudPaper>
                 <MudToolBar>
                     <MudText Typo="Typo.h6" Color="Color.Default">Project Name:&nbsp;</MudText>
-                    <MudText Typo="Typo.h6" Color="Color.Primary">@selectedProject.Name</MudText>
+                    <MudText Typo="Typo.h6" Color="Color.Primary">@filteredProjects.FirstOrDefault(x => x.Id == (int)selectedValue)?.Name</MudText>
 
                         <MudSpacer />
 
@@ -242,13 +240,14 @@
 
 @code {
     MudListItem selectedItem;
-    object selectedValue = 1;
+    object selectedValue;
     Color _color = Color.Primary;
-
-    Project selectedProject = new Project("Vanilla Sky");
-
+     
+    string searchProject;
     bool running = false;
     public record Employee(string Name, string Position, int YearsEmployed, int Salary, int Rating);
+    public IEnumerable<Project> projects;
+    public IEnumerable<Project> filteredProjects;
     public IEnumerable<ProjectOutput> projectOutputs;
 
     Stopwatch t = new Stopwatch();
@@ -256,6 +255,18 @@
 
     protected override void OnInitialized()
     {
+        var projectsList = new List<Project>()
+        {            
+            new Project(1, "Vanilla Sky"),
+            new Project(2, "Murder Mystery 2"), 
+
+        };
+        for (int i = 1; i < 15; i++)
+        {
+            projectsList.Add(new Project(i + projectsList.Count, $"The Out-Laws {i}"));
+        }
+        projects = projectsList;
+        filteredProjects  = projects;
         projectOutputs = new List<ProjectOutput>()
         {
             new ProjectOutput("h265", "25 fps", 0.23, true),
