@@ -19,10 +19,7 @@ jobs:
         dotnet-version: 8.0.100
 
     - name: Install .NET MAUI workload for macOS
-      run: dotnet workload install maui-maccatalyst
-
-    - name: Install .NET MAUI workload for Windows
-      run: dotnet workload install maui-windows
+      run: dotnet workload install maui-maccatalyst 
     
     - name: Restore Dependencies
       run: dotnet restore
