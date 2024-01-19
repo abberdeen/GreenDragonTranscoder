@@ -21,32 +21,41 @@ jobs:
     - name: Install .NET MAUI workload for macOS
       run: dotnet workload install maui-maccatalyst
 
+    - name: Install .NET MAUI workload for Windows
+      run: dotnet workload install maui-windows
+    
     - name: Restore Dependencies
       run: dotnet restore
 
-    - name: Build .NET MAUI App
-      run: dotnet build -c Release
+    - name: Build .NET MAUI App for macOS (DMG)
+      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-maccatalyst
 
-    - name: Create Temporary Folders
-      run: mkdir -p $GITHUB_WORKSPACE/temp/msix $GITHUB_WORKSPACE/temp/dmg
-
-    - name: Create MSIX Package
-      run: dotnet msbuild -t:Publish -p:Configuration=Release /p:OutputPath=$GITHUB_WORKSPACE/temp/msix
+    - name: Create Temporary Folder for DMG
+      run: mkdir -p $GITHUB_WORKSPACE/temp/dmg
 
     - name: Create DMG Package
       run: |
-        # Add commands to create DMG package here
+        # Add commands to create DMG package for net8.0-maccatalyst here
         # Example: hdiutil create -format UDRW -srcfolder $GITHUB_WORKSPACE/temp/dmg -ov $GITHUB_WORKSPACE/temp/dmg/output.dmg
-
-    - name: Archive MSIX Package
-      run: |
-        mkdir -p $GITHUB_WORKSPACE/artifacts
-        mv $GITHUB_WORKSPACE/temp/msix/*.msix $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.msix
 
     - name: Archive DMG Package
       run: |
         mkdir -p $GITHUB_WORKSPACE/artifacts
         mv $GITHUB_WORKSPACE/temp/dmg/*.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.dmg
+
+    - name: Build .NET MAUI App for Windows (MSIX)
+      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-windows10.0.19041.0
+
+    - name: Create Temporary Folder for MSIX
+      run: mkdir -p $GITHUB_WORKSPACE/temp/msix
+
+    - name: Create MSIX Package
+      run: dotnet msbuild -t:Publish -p:Configuration=Release -p:TargetFramework=net8.0-windows10.0.19041.0 /p:OutputPath=$GITHUB_WORKSPACE/temp/msix
+
+    - name: Archive MSIX Package
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/artifacts
+        mv $GITHUB_WORKSPACE/temp/msix/*.msix $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.msix
 
     - name: Create GitHub Release
       id: create_release
@@ -59,13 +68,6 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload MSIX Package
-      id: upload-msix
-      uses: actions/upload-artifact@v2
-      with:
-        name: msix-package
-        path: $GITHUB_WORKSPACE/artifacts/*.msix
-
     - name: Upload DMG Package
       id: upload-dmg
       uses: actions/upload-artifact@v2
@@ -73,15 +75,12 @@ jobs:
         name: dmg-package
         path: $GITHUB_WORKSPACE/artifacts/*.dmg
 
-    - name: Add MSIX Package to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Upload MSIX Package
+      id: upload-msix
+      uses: actions/upload-artifact@v2
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.msix
-        asset_name: GreenDragonTranscoder.msix
-        asset_content_type: application/octet-stream
+        name: msix-package
+        path: $GITHUB_WORKSPACE/artifacts/*.msix
 
     - name: Add DMG Package to Release
       uses: actions/upload-release-asset@v1
@@ -91,4 +90,14 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.dmg
         asset_name: GreenDragonTranscoder.dmg
+        asset_content_type: application/octet-stream
+
+    - name: Add MSIX Package to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.msix
+        asset_name: GreenDragonTranscoder.msix
         asset_content_type: application/octet-stream
