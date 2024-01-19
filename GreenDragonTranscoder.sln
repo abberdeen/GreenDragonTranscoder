@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GreenDragonTranscoder.Hybri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GreenDragonTranscoder.Test", "GreenDragonTranscoder.Test\GreenDragonTranscoder.Test.csproj", "{075BE0A9-29E3-41FC-B64F-7F936095BD04}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GreenDragonTranscoder.CoreLib", "GreenDragonTranscoder.CoreLib\GreenDragonTranscoder.CoreLib.csproj", "{FE4A1894-ACEF-409A-837D-0B10141531E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenDragonTranscoder.MauiCore", "GreenDragonTranscoder.MauiCore\GreenDragonTranscoder.MauiCore.csproj", "{316077D6-D1FB-481A-B5ED-A37859A604C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,10 @@ Global
 		{075BE0A9-29E3-41FC-B64F-7F936095BD04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{075BE0A9-29E3-41FC-B64F-7F936095BD04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{075BE0A9-29E3-41FC-B64F-7F936095BD04}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE4A1894-ACEF-409A-837D-0B10141531E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{316077D6-D1FB-481A-B5ED-A37859A604C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{316077D6-D1FB-481A-B5ED-A37859A604C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{316077D6-D1FB-481A-B5ED-A37859A604C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{316077D6-D1FB-481A-B5ED-A37859A604C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

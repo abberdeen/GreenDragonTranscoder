@@ -22,8 +22,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\GreenDragonTranscoder.CoreLib\GreenDragonTranscoder.CoreLib.csproj" />
-  </ItemGroup>
-
 </Project>

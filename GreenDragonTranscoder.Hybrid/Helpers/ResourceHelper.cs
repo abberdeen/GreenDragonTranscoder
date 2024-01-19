@@ -1,9 +1,5 @@
 ﻿using GreenDragonTranscoder.Hybrid.Properties;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
-using SkiaSharp;
-using System;
-
+ 
 namespace GreenDragonTranscoder.Hybrid.Helpers
 {
     public class ResourceHelper

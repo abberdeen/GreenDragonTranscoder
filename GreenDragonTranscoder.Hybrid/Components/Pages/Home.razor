@@ -1,8 +1,8 @@
 ﻿@page "/" 
-@using GreenDragonTranscoder.CoreLib.Services
-@using GreenDragonTranscoder.CoreLib.Services.SlateService
+@using GreenDragonTranscoder.MauiCore.Services
+@using GreenDragonTranscoder.MauiCore.Services.SlateService
 @using GreenDragonTranscoder.Hybrid.Helpers
-@using System.Diagnostics
+@using System.Diagnostics 
 @*
 <MudToolBar>
     <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
@@ -311,7 +311,6 @@
 
 
         using var font = await FileSystem.Current.OpenAppPackageFileAsync("Castoro-Regular.ttf");
-
         using var background = await FileSystem.Current.OpenAppPackageFileAsync("slate_background.tif");
         using var slateConfig = await FileSystem.Current.OpenAppPackageFileAsync("slateDrawingConfig.json");
 

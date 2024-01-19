@@ -25,7 +25,7 @@
         <ApplicationTitle>Green Dragon Transcoder</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.pulodian.greendragontranscoder.hybrid</ApplicationId>
+        <ApplicationId>com.pulodian.greendragontranscoder</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -85,10 +85,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GreenDragonTranscoder.CoreLib\GreenDragonTranscoder.CoreLib.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Update="Properties\Resources.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -105,6 +101,10 @@
 
     <ItemGroup>
       <Folder Include="Resources\Data\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GreenDragonTranscoder.MauiCore\GreenDragonTranscoder.MauiCore.csproj" />
     </ItemGroup>
 
     <ItemGroup>
