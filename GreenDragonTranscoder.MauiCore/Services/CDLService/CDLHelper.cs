@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
-using static GreenDragonTranscoder.CoreLib.Services.CDLService.CDLParameters;
+using static GreenDragonTranscoder.MauiCore.Services.CDLService.CDLParameters;
 namespace GreenDragonTranscoder.MauiCore.Services.CDLService
 {
     public static class CDLHelper

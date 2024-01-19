@@ -1,6 +1,4 @@
-using BitMiracle.LibTiff.Classic;
-using GreenDragonTranscoder.CoreLib.Services.CDLService;
-using Xunit;
+using GreenDragonTranscoder.MauiCore.Services.CDLService;
 
 namespace GreenDragonTranscoder.Test
 {
@@ -28,10 +26,10 @@ namespace GreenDragonTranscoder.Test
                                        "b='pow((b(X,Y))*1+0,1)+(1-0.5)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.5'";
 
             // Act
-            string result = CDLHelper.ConvertCDLToGECFilterV1(cdlInput);
+            string? gecFilterV1 = CDLHelper.ConvertCDLToGECFilterV1(cdlInput);
 
             // Assert
-            Assert.Equal(expectedGEQFilter, result);
+            Assert.Equal(expectedGEQFilter, gecFilterV1);
         }
 
         [Fact]
@@ -41,7 +39,7 @@ namespace GreenDragonTranscoder.Test
             // ...consts
 
             // Act
-            string result = CDLHelper.ConvertCDLToGECFilterV1(cdlInput);
+            string? result = CDLHelper.ConvertCDLToGECFilterV1(cdlInput);
 
             // Assert
             Assert.Equal(expectedGEQFilter, result);
@@ -57,7 +55,7 @@ namespace GreenDragonTranscoder.Test
             Assert.Throws<ArgumentException>(() =>
             {
                 // Act
-                string result = CDLHelper.ConvertCDLToGECFilterV1(invalidCDLInput);
+                string? gecFilterV1 = CDLHelper.ConvertCDLToGECFilterV1(invalidCDLInput);
             });
         }
 
@@ -138,10 +136,10 @@ namespace GreenDragonTranscoder.Test
 
 
             // Act
-            string result = CDLHelper.ConvertCDLToGECFilterV1(cdlParameters);
+            string? gecFilterV1 = CDLHelper.ConvertCDLToGECFilterV1(cdlParameters);
 
             // Assert
-            Assert.Equal(expectedGEQFilter, result);
+            Assert.Equal(expectedGEQFilter, gecFilterV1);
         }
     }
 }
