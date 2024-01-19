@@ -1,30 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using static GreenDragonTranscoder.CoreLib.Services.CDLService.CDLParameters;
 
 namespace GreenDragonTranscoder.CoreLib.Services.CDLService
 {
     public static class CDLHelper
     {
-        public static string ConvertCDLToGEQ_FX1(string cdlInput) 
+        public static string ConvertCDLToGECFilterV1(string cdlInput)
         {
             var cdlParamers = ParseCDLParameters(cdlInput);
-            
-            if (cdlParamers == null) 
+
+            if (cdlParamers == null)
             {
                 return null;
             }
 
-            var gecFilter = ConvertCDLToGEQ_FX1(cdlParamers);
+            var gecFilter = ConvertCDLToGECFilterV1(cdlParamers);
 
             return gecFilter;
         }
 
-        public static string ConvertCDLToGEQ_FX1(CDLParameters cdl)
+        public static string ConvertCDLToGECFilterV1(CDLParameters cdl)
         {
             if (cdl == null)
             {
@@ -39,7 +35,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
             string wB = "0.0722";  // weightBlue
 
             // Extract static numbers as strings
-            string sV = cdl.SaturationValue.Value.ToString(culture);  // saturationValue
+            string sV = cdl.Saturation.ToString(culture);  // saturationValue
             string sVC = $"1-{sV}";  // saturationValueComplement
             string rS = cdl.Slope.Red.ToString(culture);  // redSlope
             string rO = cdl.Offset.Red.ToString(culture);  // redOffset
@@ -56,6 +52,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
             string operatorGSO = cdl.Offset.Green < 0 ? "" : "+";
             string operatorBSO = cdl.Offset.Blue < 0 ? "" : "+";
 
+            // https://ffmpeg.org/ffmpeg-filters.html#geq
             var geqFilter = $"geq=\\\n" +
                      $"r='pow((r(X,Y))*{rS}{operatorRSO}{rO},{rP})+({sVC})*({wR}*r(X,Y)+{wG}*g(X,Y)+{wB}*b(X,Y))*{sV}':\\\n" +
                      $"g='pow((g(X,Y))*{gS}{operatorGSO}{gO},{gP})+({sVC})*({wR}*r(X,Y)+{wG}*g(X,Y)+{wB}*b(X,Y))*{sV}':\\\n" +
@@ -92,31 +89,50 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
 
             var saturationValue = float.Parse(values[3], culture);
 
+            return MapToCDLParameters(slopeArray, offsetArray, powerArray, saturationValue);
+        }
+
+        public static CDLParameters ParseInlineCDLParameters(string cdlInput)
+        {
+            var patterns = new[]
+            {
+              @"\((.*?)\)",
+              @"(\d+\.\d+)"
+          };
+
+            var matches = patterns.SelectMany(pattern => Regex.Matches(cdlInput, pattern, RegexOptions.IgnoreCase)
+                                                                .Cast<Match>()
+                                                                .Select(m => m.Groups[1].Value))
+                .ToArray();
+
+            if (matches.Length != 13)
+            {
+                throw new ArgumentException("Invalid CDL format");
+            }
+
+            // Specify the culture with the desired decimal separator
+            CultureInfo culture = CultureInfo.InvariantCulture; // Use InvariantCulture for a dot as the decimal separator
+
+            var parseValues = matches.SelectMany(s => s.Split(',').Select(value => float.Parse(value, culture))).ToArray();
+
+            var slopeArray = parseValues.Take(3).ToArray();
+            var offsetArray = parseValues.Skip(3).Take(3).ToArray();
+            var powerArray = parseValues.Skip(6).Take(3).ToArray();
+
+            var saturationValue = parseValues.Last();
+
+            return MapToCDLParameters(slopeArray, offsetArray, powerArray, saturationValue);
+        }
+
+        private static CDLParameters MapToCDLParameters(float[] slopeArray, float[] offsetArray, float[] powerArray, float saturationValue)
+        {
             return new CDLParameters
             {
-                Slope = new CDLParameters.ColorAdjustment
-                {
-                    Red = slopeArray[0],
-                    Green = slopeArray[1],
-                    Blue = slopeArray[2]
-                },
-                Offset = new CDLParameters.ColorAdjustment
-                {
-                    Red = offsetArray[0],
-                    Green = offsetArray[1],
-                    Blue = offsetArray[2]
-                },
-                Power = new CDLParameters.ColorAdjustment
-                {
-                    Red = powerArray[0],
-                    Green = powerArray[1],
-                    Blue = powerArray[2]
-                },
-                SaturationValue = new CDLParameters.Saturation
-                {
-                    Value = saturationValue
-                }
+                Slope = new ColorAdjustment(slopeArray[0], slopeArray[1], slopeArray[2]),
+                Offset = new ColorAdjustment(offsetArray[0], offsetArray[1], offsetArray[2]),
+                Power = new ColorAdjustment(powerArray[0], powerArray[1], powerArray[2]),
+                Saturation = saturationValue
             };
-        } 
+        }
     }
 }
