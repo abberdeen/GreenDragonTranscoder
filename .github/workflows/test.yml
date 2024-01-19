@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 8.0.100
+
+    - name: Install .NET MAUI workload
+      run: dotnet workload install maui-maccatalyst maui-windows
+
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Build .NET MAUI App
+      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-${{ matrix.os == 'macos-latest' ? 'maccatalyst' : 'windows10.0.19041.0' }}
+
+    - name: Create Temporary Folder for Package
+      run: mkdir -p $GITHUB_WORKSPACE/temp/${{ matrix.os == 'macos-latest' ? 'dmg' : 'msix' }}
+
+    - name: Create Package
+      run: |
+        # Add commands to create the package for the respective OS here
+        # Example: hdiutil create -format UDRW -srcfolder $GITHUB_WORKSPACE/temp/dmg -ov $GITHUB_WORKSPACE/temp/dmg/output.dmg
+        # Example: dotnet msbuild -t:Publish -p:Configuration=Release -p:TargetFramework=net8.0-windows10.0.19041.0 /p:OutputPath=$GITHUB_WORKSPACE/temp/msix
+
+    - name: Archive Package
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/artifacts
+        mv $GITHUB_WORKSPACE/temp/${{ matrix.os == 'macos-latest' ? 'dmg' : 'msix' }}/* $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.${{ matrix.os == 'macos-latest' ? 'dmg' : 'msix' }}
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Package
+      id: upload-package
+      uses: actions/upload-artifact@v2
+      with:
+        name: package
+        path: $GITHUB_WORKSPACE/artifacts/*.${{ matrix.os == 'macos-latest' ? 'dmg' : 'msix' }}
+
+    - name: Add Package to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.${{ matrix.os == 'macos-latest' ? 'dmg' : 'msix' }}
+        asset_name: GreenDragonTranscoder.${{ matrix.os == 'macos-latest' ? 'dmg' : 'msix' }}
+        asset_content_type: application/octet-stream
