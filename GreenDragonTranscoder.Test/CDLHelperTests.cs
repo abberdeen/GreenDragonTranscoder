@@ -1,3 +1,4 @@
+using BitMiracle.LibTiff.Classic;
 using GreenDragonTranscoder.CoreLib.Services.CDLService;
 using Xunit;
 
@@ -16,7 +17,7 @@ namespace GreenDragonTranscoder.Test
                                        "b='pow((b(X,Y))*1+0,1)+(1-0.5)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.5'";
 
             // Act
-            string result = CDLHelper.ConvertCDLToGEQ(cdlInput);
+            string result = CDLHelper.ConvertCDLToGEQ_FX1(cdlInput);
 
             // Assert
             Assert.Equal(expectedGEQFilter, result);
@@ -32,12 +33,12 @@ namespace GreenDragonTranscoder.Test
                               "<Saturation>0.801050</Saturation>";
 
             string expectedGEQFilter = "geq=\\\n" +
-                                       "r='pow((r(X,Y))*0.904771+0.008296,1.052651)+(1-0.801050)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.801050':\\\n" +
-                                       "g='pow((g(X,Y))*0.931037+0.017804,1.005324)+(1-0.801050)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.801050':\\\n" +
-                                       "b='pow((b(X,Y))*1.011883-0.026100,0.945201)+(1-0.801050)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.801050'";
+                                       "r='pow((r(X,Y))*0.904771+0.008296,1.052651)+(1-0.80105)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.80105':\\\n" +
+                                       "g='pow((g(X,Y))*0.931037+0.017804,1.005324)+(1-0.80105)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.80105':\\\n" +
+                                       "b='pow((b(X,Y))*1.011883-0.0261,0.945201)+(1-0.80105)*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*0.80105'";
 
             // Act
-            string result = CDLHelper.ConvertCDLToGEQ(cdlInput);
+            string result = CDLHelper.ConvertCDLToGEQ_FX1(cdlInput);
 
             // Assert
             Assert.Equal(expectedGEQFilter, result);
@@ -48,12 +49,13 @@ namespace GreenDragonTranscoder.Test
         {
             // Arrange
             string invalidCDLInput = "<CDL>InvalidInput</CDL>";
-
-            // Act
-            string result = CDLHelper.ConvertCDLToGEQ(invalidCDLInput);
-
+             
             // Assert
-            Assert.Null(result);
+            Assert.Throws<ArgumentException>(() =>
+            {
+                // Act
+                string result = CDLHelper.ConvertCDLToGEQ_FX1(invalidCDLInput);
+            });
         }
 
         [Fact]
@@ -85,11 +87,12 @@ namespace GreenDragonTranscoder.Test
             // Arrange
             string invalidCDLInput = "InvalidInput";
 
-            // Act
-            CDLParameters result = CDLHelper.ParseCDLParameters(invalidCDLInput);
-
             // Assert
-            Assert.Null(result);
+            Assert.Throws<ArgumentException>(() =>
+            {
+                // Act
+                CDLParameters result = CDLHelper.ParseCDLParameters(invalidCDLInput);
+            });
         }
     }
 }

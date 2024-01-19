@@ -10,7 +10,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
 {
     public static class CDLHelper
     {
-        public static string ConvertCDLToGEQ(string cdlInput) 
+        public static string ConvertCDLToGEQ_FX1(string cdlInput) 
         {
             var cdlParamers = ParseCDLParameters(cdlInput);
             
@@ -19,12 +19,12 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
                 return null;
             }
 
-            var gecFilter = ConvertCDLToGEQ(cdlParamers);
+            var gecFilter = ConvertCDLToGEQ_FX1(cdlParamers);
 
             return gecFilter;
         }
 
-        public static string ConvertCDLToGEQ(CDLParameters cdl)
+        public static string ConvertCDLToGEQ_FX1(CDLParameters cdl)
         {
             if (cdl == null)
             {
@@ -33,14 +33,37 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
 
             CultureInfo culture = CultureInfo.InvariantCulture; // Use InvariantCulture for dot as the decimal separator
 
-            var geqFilter = $"geq=\\\n" +
-                            $"r='pow((r(X,Y))*{cdl.Slope.Red.ToString(culture)}+{cdl.Offset.Red.ToString(culture)},{cdl.Power.Red.ToString(culture)})+(1-{cdl.SaturationValue.Value.ToString(culture)})*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*{cdl.SaturationValue.Value.ToString(culture)}':\\\n" +
-                            $"g='pow((g(X,Y))*{cdl.Slope.Green.ToString(culture)}+{cdl.Offset.Green.ToString(culture)},{cdl.Power.Green.ToString(culture)})+(1-{cdl.SaturationValue.Value.ToString(culture)})*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*{cdl.SaturationValue.Value.ToString(culture)}':\\\n" +
-                            $"b='pow((b(X,Y))*{cdl.Slope.Blue.ToString(culture)}+{cdl.Offset.Blue.ToString(culture)},{cdl.Power.Blue.ToString(culture)})+(1-{cdl.SaturationValue.Value.ToString(culture)})*(0.2126*r(X,Y)+0.7152*g(X,Y)+0.0722*b(X,Y))*{cdl.SaturationValue.Value.ToString(culture)}'";
+            // Extract constants as strings
+            string wR = "0.2126";  // weightRed
+            string wG = "0.7152";  // weightGreen
+            string wB = "0.0722";  // weightBlue
 
-            return geqFilter; 
+            // Extract static numbers as strings
+            string sV = cdl.SaturationValue.Value.ToString(culture);  // saturationValue
+            string sVC = $"1-{sV}";  // saturationValueComplement
+            string rS = cdl.Slope.Red.ToString(culture);  // redSlope
+            string rO = cdl.Offset.Red.ToString(culture);  // redOffset
+            string rP = cdl.Power.Red.ToString(culture);  // redPower
+            string gS = cdl.Slope.Green.ToString(culture);  // greenSlope
+            string gO = cdl.Offset.Green.ToString(culture);  // greenOffset
+            string gP = cdl.Power.Green.ToString(culture);  // greenPower
+            string bS = cdl.Slope.Blue.ToString(culture);  // blueSlope
+            string bO = cdl.Offset.Blue.ToString(culture);  // blueOffset
+            string bP = cdl.Power.Blue.ToString(culture);  // bluePower
+
+            // Adjust the sign of the offset based on its sign
+            string operatorRSO = cdl.Offset.Red < 0 ? "" : "+";
+            string operatorGSO = cdl.Offset.Green < 0 ? "" : "+";
+            string operatorBSO = cdl.Offset.Blue < 0 ? "" : "+";
+
+            var geqFilter = $"geq=\\\n" +
+                     $"r='pow((r(X,Y))*{rS}{operatorRSO}{rO},{rP})+({sVC})*({wR}*r(X,Y)+{wG}*g(X,Y)+{wB}*b(X,Y))*{sV}':\\\n" +
+                     $"g='pow((g(X,Y))*{gS}{operatorGSO}{gO},{gP})+({sVC})*({wR}*r(X,Y)+{wG}*g(X,Y)+{wB}*b(X,Y))*{sV}':\\\n" +
+                     $"b='pow((b(X,Y))*{bS}{operatorBSO}{bO},{bP})+({sVC})*({wR}*r(X,Y)+{wG}*g(X,Y)+{wB}*b(X,Y))*{sV}'";
+
+            return geqFilter;
         }
-         
+
         public static CDLParameters ParseCDLParameters(string cdlInput)
         {
             var patterns = new[]
@@ -55,8 +78,7 @@ namespace GreenDragonTranscoder.CoreLib.Services.CDLService
 
             if (matches.Any(match => !match.Success))
             {
-                Console.WriteLine("Invalid CDL format");
-                return null;
+                throw new ArgumentException("Invalid CDL format");
             }
 
             var values = matches.Select(match => match.Groups[1].Value).ToArray();
