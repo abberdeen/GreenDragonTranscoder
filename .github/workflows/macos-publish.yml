@@ -104,9 +104,6 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore
 
-      - name: Build .NET MAUI App for Windows (x64)
-        run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
-
       - name: Set MSIX Path and Asset Name
         id: set_msix
         run: |
@@ -116,11 +113,11 @@ jobs:
           Write-Host "MSIX Folder: $msix_folder"
           Write-Host "MSIX Bundle File Path: $msixbundle_filepath"
           
-          Get-ChildItem $msix_folder
-          
           Write-Output "msix_folder=$msix_folder" >> $env:GITHUB_ENV
           Write-Output "msixbundle_filepath=$msixbundle_filepath" >> $env:GITHUB_ENV
-
+          
+      - name: Build .NET MAUI App for Windows (x64)
+        run: dotnet build -c Release -t:Build -o "${{ steps.set_msix.outputs.msix_folder }}" -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
         
       - name: Make MSIX Bundle
         id: bundler
