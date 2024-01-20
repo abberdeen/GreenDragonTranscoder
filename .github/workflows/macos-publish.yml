@@ -30,10 +30,16 @@ jobs:
 
     - name: Create Artifacts Folder
       run: |
+        set -e  # Exit on error
+        
+        # Create folders
         mkdir -p $GITHUB_WORKSPACE/build/x64
         mkdir -p $GITHUB_WORKSPACE/build/arm64
         mkdir -p $GITHUB_WORKSPACE/artifacts
-        ls -l $GITHUB_WORKSPACE
+    
+        # Display the contents of the workspace for debugging
+        ls -l $GITHUB_WORKSPACE 
+
         
     # Build .NET MAUI App for macOS (maccatalyst-x64)
     - name: Build .NET MAUI App for macOS (maccatalyst-x64)
