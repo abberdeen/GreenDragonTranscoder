@@ -62,36 +62,38 @@ jobs:
         ls -l $GITHUB_WORKSPACE
         
     - name: Set x64 DMG Path
-      run: |
-        ABSOLUTE_PATH_X64=$(realpath "$GITHUB_WORKSPACE/GreenDragonTranscoder-x64.dmg")
-        echo "Absolute Path for x64 DMG: $ABSOLUTE_PATH_X64"
       id: set_x64
+      run: |
+        absolute_path_x64="${GITHUB_WORKSPACE}/GreenDragonTranscoder-x64.dmg"
+        echo "Absolute Path for x64 DMG: $absolute_path_x64"
+        echo "::set-output name=absolute_path_x64::$absolute_path_x64"
     
     - name: Upload x64 DMG
       id: upload_x64
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ steps.set_x64.outputs.ABSOLUTE_PATH_X64 }}
+        asset_path: ${{ steps.set_x64.outputs.absolute_path_x64 }}
         asset_name: GreenDragonTranscoder-x64.dmg
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     
     - name: Set arm64 DMG Path
-      run: |
-        ABSOLUTE_PATH_ARM64=$(realpath "$GITHUB_WORKSPACE/GreenDragonTranscoder-arm64.dmg")
-        echo "Absolute Path for arm64 DMG: $ABSOLUTE_PATH_ARM64"
       id: set_arm64
+      run: |
+        absolute_path_arm64="${GITHUB_WORKSPACE}/GreenDragonTranscoder-arm64.dmg"
+        echo "Absolute Path for arm64 DMG: $absolute_path_arm64"
+        echo "::set-output name=absolute_path_arm64::$absolute_path_arm64"
     
     - name: Upload arm64 DMG
       id: upload_arm64
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ steps.set_arm64.outputs.ABSOLUTE_PATH_ARM64 }}
+        asset_path: ${{ steps.set_arm64.outputs.absolute_path_arm64 }}
         asset_name: GreenDragonTranscoder-arm64.dmg
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        
+     
