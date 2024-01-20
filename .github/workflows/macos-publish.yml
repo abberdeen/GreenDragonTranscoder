@@ -22,6 +22,13 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Set DMG Path and Asset Name
+        id: set_dmg
+        run: |
+          upload_url="${{ steps.create_release.outputs.upload_url }}" 
+          echo "Upload Url: $upload_url"
+          echo "::set-output name=upload_url::$upload_url"
+          
       - name: Set Release Upload URL
         run: echo "RELEASE_UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
 
@@ -39,7 +46,7 @@ jobs:
         run: echo "RELEASE_OUTPUT=${{ toJson(needs.release.outputs) }}"
 
       - name: Print RELEASE_UPLOAD_URL in MacOS Job
-        run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
+        run: echo "${{ needs.release.outputs['release_output.upload_url'] }}"
         
       - name: Print RELEASE_UPLOAD_URL in MacOS Job
         run: echo "RELEASE_UPLOAD_URL=${{ needs.release.outputs.release_output.RELEASE_UPLOAD_URL }}"
