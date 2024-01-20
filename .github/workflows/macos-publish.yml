@@ -42,7 +42,7 @@ jobs:
     - name: Create DMG Package (maccatalyst-x64)
       run: |
         ls -l $GITHUB_WORKSPACE/build/x64
-        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/x64 -o $GITHUB_WORKSPACE/GreenDragonTranscoder-x64.dmg
+        hdiutil create -verbose -format UDZO -srcfolder $GITHUB_WORKSPACE/build/x64 -ov $GITHUB_WORKSPACE/GreenDragonTranscoder-x64.dmg
 
     # Build .NET MAUI App for macOS (maccatalyst-arm64)
     - name: Build .NET MAUI App for macOS (maccatalyst-arm64)
@@ -51,7 +51,7 @@ jobs:
     - name: Create DMG Package (maccatalyst-arm64)
       run: |
         ls -l $GITHUB_WORKSPACE/build/arm64
-        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/arm64 -o $GITHUB_WORKSPACE/GreenDragonTranscoder-arm64.dmg
+        hdiutil create -verbose -format UDZO -srcfolder $GITHUB_WORKSPACE/build/arm64 -ov $GITHUB_WORKSPACE/GreenDragonTranscoder-arm64.dmg
         
     - name: Create GitHub Release
       id: create_release
