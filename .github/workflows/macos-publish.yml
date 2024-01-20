@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      id: release_output
     steps:
       - name: Create GitHub Release
         id: create_release
@@ -19,6 +21,9 @@ jobs:
           release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
+
+      - name: Set Release Upload URL
+        run: echo "RELEASE_UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
 
   macos:
     needs: release
@@ -65,7 +70,7 @@ jobs:
         id: upload_dmg
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}
           asset_path: ${{ steps.set_dmg.outputs.absolute_path }}
           asset_name: ${{ steps.set_dmg.outputs.asset_name }}
           asset_content_type: application/x-diskcopy
@@ -116,4 +121,15 @@ jobs:
           echo "Absolute Path for x64 MSIX Bundle: $msix_path"
           echo "Asset Name: $asset_name"
           echo "::set-output name=absolute_path_x64::$msix_path"
-          echo "::set-output name=asset_name_x64
+          echo "::set-output name=asset_name_x64::$asset_name"
+
+      - name: Upload MSIX Bundle
+        id: upload_msix
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}
+          asset_path: ${{ steps.set_msix.outputs.absolute_path_x64 }}
+          asset_name: ${{ steps.set_msix.outputs.asset_name_x64 }}
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
