@@ -89,18 +89,7 @@ jobs:
     steps:    
       - name: Upload Url
         run: echo "upload_url=${{ needs.release.outputs.upload_url }}" 
-
-      - name: Set MSIX Path and Asset Name
-        id: set_msix
-        run: |
-          $msix_folder = "\app\build\x64"
-          $msixbundle_filepath = "\app\GreenDragonTranscoder_x64.msixbundle"
-          
-          Write-Host "MSIX Folder: $msix_folder"
-          Write-Host "MSIX Bundle File Path: $msixbundle_filepath"
-          
-          Write-Output "msix_folder=$msix_folder" >> $env:GITHUB_ENV
-          Write-Output "msixbundle_filepath=$msixbundle_filepath" >> $env:GITHUB_ENV
+ 
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -116,11 +105,11 @@ jobs:
         run: dotnet restore
           
       - name: Build .NET MAUI App for Windows (x64)
-        run: dotnet build -c Release -t:Build -o "${{ steps.set_msix.outputs.msix_folder }}" -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
+        run: dotnet build -c Release -t:Build -o /app/build/x64 -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
 
       - name: List Files in Directory
         run: |
-          $directoryPath ="${{ steps.set_msix.outputs.msix_folder }}"
+          $directoryPath ="/app/build/x64"
           
           Write-Host "Files in directory: $directoryPath"
           Get-ChildItem -Path $directoryPath
@@ -129,8 +118,8 @@ jobs:
         id: bundler
         uses: LanceMcCarthy/Action-MsixBundler@v1.0.0
         with:
-          msix-folder: "${{ steps.set_msix.outputs.msix_folder }}"
-          msixbundle-filepath: "${{ steps.set_msix.outputs.msixbundle_filepath }}" 
+          msix-folder: "/app/build/x64"
+          msixbundle-filepath: "/app/GreenDragonTranscoder_x64.msixbundle" 
           
       - name: Verify MSIX Bundle File Path
         shell: pwsh
@@ -143,8 +132,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ${{ steps.set_msix.outputs.msixbundle_filepath }}
-          asset_name: ${{ steps.set_msix.outputs.asset_name_x64 }}
+          asset_path: "/app/GreenDragonTranscoder_x64.msixbundle" 
+          asset_name: GreenDragonTranscoder_x64.msixbundle
           asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
