@@ -105,35 +105,30 @@ jobs:
         run: dotnet restore
           
       - name: Build .NET MAUI App for Windows (x64)
-        run: dotnet build -c Release -t:Build -o /app/build/x64 -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
+        run:  dotnet publish  %GITHUB_WORKSPACE%/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid.csproj -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 --sc --no-restore
 
-      - name: List Files in Directory
-        run: |
-          $directoryPath ="/app/build/x64"
-          
-          Write-Host "Files in directory: $directoryPath"
-          Get-ChildItem -Path $directoryPath
-          
-      - name: Make MSIX Bundle
-        id: bundler
-        uses: LanceMcCarthy/Action-MsixBundler@v1.0.0
-        with:
-          msix-folder: "/app/build/x64"
-          msixbundle-filepath: "/app/GreenDragonTranscoder_x64.msixbundle" 
-          
-      - name: Verify MSIX Bundle File Path
+      - name: Find first matching file
+        id: findFile
         shell: pwsh
         run: |
-          $path_to_my_msix_bundle = ${{ steps.bundler.outputs.msixbundle_path }}
-          Write-Output "MSIX Bundle Path: $path_to_my_msix_bundle"
-          
+          # Define the path pattern
+          $pathPattern = "%GITHUB_WORKSPACE%\GreenDragonTranscoder\bin\Release\net*-windows*\*\AppPackages\GreenDragonTranscoder*\GreenDragonTranscoder*.msix"
+  
+          # Get the matching files
+          $matchingFiles = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter $pathPattern -File
+  
+          # Select the first file
+          $firstMatchingFile = $matchingFiles | Select-Object -First 1
+  
+          # Set the output variable
+          Write-Output "##vso[task.setvariable variable=firstMatchingFile]$($firstMatchingFile.FullName)"
       - name: Upload MSIX Bundle
         id: upload_msix
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: "/app/GreenDragonTranscoder_x64.msixbundle" 
-          asset_name: GreenDragonTranscoder_x64.msixbundle
+          asset_path: ${{ steps.findFile.outputs.firstMatchingFile }}
+          asset_name: GreenDragonTranscoder_x64.msix
           asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
