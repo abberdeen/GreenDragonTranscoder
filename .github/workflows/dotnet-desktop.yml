@@ -75,20 +75,6 @@ jobs:
         mkdir -p $GITHUB_WORKSPACE/artifacts
         mv $GITHUB_WORKSPACE/temp/dmg-arm64/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
  
-    - name: Build .NET MAUI App for Windows (MSIX)
-      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-windows10.0.19041.0
-
-    - name: Create Temporary Folder for MSIX
-      run: mkdir -p $GITHUB_WORKSPACE/temp/msix
-
-    - name: Create MSIX Package
-      run: dotnet msbuild -t:Publish -p:Configuration=Release -p:TargetFramework=net8.0-windows10.0.19041.0 /p:OutputPath=$GITHUB_WORKSPACE/temp/msix
-
-    - name: Archive MSIX Package
-      run: |
-        mkdir -p $GITHUB_WORKSPACE/artifacts
-        mv $GITHUB_WORKSPACE/temp/msix/*.msix $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.msix
-
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
@@ -107,13 +93,6 @@ jobs:
         name: dmg-package
         path: $GITHUB_WORKSPACE/artifacts/*.dmg
 
-    - name: Upload MSIX Package
-      id: upload-msix
-      uses: actions/upload-artifact@v2
-      with:
-        name: msix-package
-        path: $GITHUB_WORKSPACE/artifacts/*.msix
-
     - name: Add DMG Package to Release
       uses: actions/upload-release-asset@v1
       env:
@@ -122,14 +101,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.dmg
         asset_name: GreenDragonTranscoder.dmg
-        asset_content_type: application/octet-stream
-
-    - name: Add MSIX Package to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.msix
-        asset_name: GreenDragonTranscoder.msix
-        asset_content_type: application/octet-stream
+        asset_content_type: application/octet-stream 
