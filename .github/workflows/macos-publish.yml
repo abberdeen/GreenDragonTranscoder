@@ -1,4 +1,4 @@
-name: MacOS - Build and Release
+name: Build and Release
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
           draft: false
           prerelease: false
 
-  build:
+  macos:
     needs: release
     runs-on: macos-latest
     
@@ -37,14 +37,6 @@ jobs:
         with:
           dotnet-version: 8.0.101
 
-      - name: Setup xCode latest
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-
-      - name: Install .NET MAUI workload for macOS
-        run: dotnet workload install maui-maccatalyst
-
       - name: Restore Dependencies
         run: dotnet restore
 
@@ -56,24 +48,77 @@ jobs:
           ls -l $GITHUB_WORKSPACE/build/${{ matrix.arch }}
           hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/${{ matrix.arch }} -ov -o $GITHUB_WORKSPACE/GreenDragonTranscoder-${{ matrix.arch }}.dmg
 
-      - name: Debug - List Artifacts Directory
-        run: |
-          ls -l $GITHUB_WORKSPACE
-
-      - name: Set DMG Path
+      - name: Set DMG Path and Asset Name
         id: set_dmg
         run: |
-          absolute_path="${GITHUB_WORKSPACE}/GreenDragonTranscoder-${{ matrix.arch }}.dmg"
-          echo "Absolute Path for ${{ matrix.arch }} DMG: $absolute_path"
-          echo "::set-output name=absolute_path_${{ matrix.arch }}::$absolute_path"
+          dmg_path="${GITHUB_WORKSPACE}/GreenDragonTranscoder-${{ matrix.arch }}.dmg"
+          asset_name="GreenDragonTranscoder-${{ matrix.arch }}.dmg"
+          echo "Absolute Path for ${{ matrix.arch }} DMG: $dmg_path"
+          echo "Asset Name: $asset_name"
+          echo "::set-output name=absolute_path::$dmg_path"
+          echo "::set-output name=asset_name::$asset_name"
 
       - name: Upload DMG
         id: upload_dmg
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.set_dmg.outputs.absolute_path_${{ matrix.arch }} }}
-          asset_name: GreenDragonTranscoder-${{ matrix.arch }}.dmg
+          asset_path: ${{ steps.set_dmg.outputs.absolute_path }}
+          asset_name: ${{ steps.set_dmg.outputs.asset_name }}
           asset_content_type: application/x-diskcopy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  windows:
+    needs: release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.101
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build .NET MAUI App for Windows (x64)
+        run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-windows -p:Arch=x64
+
+      - name: Make MSIX Bundle
+        id: bundler
+        uses: LanceMcCarthy/Action-MsixBundler@v1.0.0
+        with:
+          msix-folder: "$GITHUB_WORKSPACE/build/x64"
+          msixbundle-filepath: "$GITHUB_WORKSPACE/build/GreenDragonTranscoder_x64.msixbundle"
+          msixbundle-version: "1.0.0.0"
+          
+      - name: Verify MSIX Bundle File Path
+        shell: pwsh
+        run: |
+          $path_to_my_msix_bundle = ${{ steps.bundler.outputs.msixbundle_path }}
+          Write-Output $path_to_my_msix_bundle
+
+      - name: Set MSIX Path and Asset Name
+        id: set_msix
+        run: |
+          msix_path="${GITHUB_WORKSPACE}/build/GreenDragonTranscoder_x64.msixbundle"
+          asset_name="GreenDragonTranscoder_x64.msixbundle"
+          echo "Absolute Path for x64 MSIX Bundle: $msix_path"
+          echo "Asset Name: $asset_name"
+          echo "::set-output name=absolute_path_x64::$msix_path"
+          echo "::set-output name=asset_name_x64::$asset_name"
+
+      - name: Upload MSIX Bundle
+        id: upload_msix
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.set_msix.outputs.absolute_path_x64 }}
+          asset_name: ${{ steps.set_msix.outputs.asset_name_x64 }}
+          asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
