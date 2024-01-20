@@ -125,7 +125,10 @@ jobs:
           echo "Asset Name: $asset_name"
           echo "::set-output name=absolute_path_x64::$msix_path"
           echo "::set-output name=asset_name_x64::$asset_name"
-
+          
+      - name: Print RELEASE_UPLOAD_URL
+        run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
+        
       - name: Upload MSIX Bundle
         id: upload_msix
         uses: actions/upload-release-asset@v1
