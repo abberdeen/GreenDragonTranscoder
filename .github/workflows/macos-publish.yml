@@ -39,9 +39,7 @@ jobs:
         
       - name: Print RELEASE_UPLOAD_URL in MacOS Job
         run: echo "RELEASE_UPLOAD_URL=${{ needs.release.outputs.release_output.RELEASE_UPLOAD_URL }}"
-
-      - name: Print RELEASE_UPLOAD_URL in MacOS Job
-        run: echo "${{ RELEASE_UPLOAD_URL }}"
+ 
         
       - name: Print RELEASE_UPLOAD_URL in Release Job
         run: echo "RELEASE_UPLOAD_URL=${RELEASE_UPLOAD_URL}"
