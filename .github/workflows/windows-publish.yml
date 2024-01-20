@@ -18,9 +18,6 @@ jobs:
       with:
         dotnet-version: 8.0.101
 
-    - name: Setup MSIX Packaging Tool
-      uses: microsoft/setup-msix-tool@latest
-
     - name: Install .NET MAUI workload for Windows
       run: dotnet workload install maui-windows
   
@@ -33,12 +30,12 @@ jobs:
 
     # Package .NET MAUI App as MSIX
     - name: Package .NET MAUI App as MSIX
-      run: msix pack -d $GITHUB_WORKSPACE\temp\msix-x64 -p $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-x64.msix -a x64 -r $GITHUB_WORKSPACE\bin\Release\net8.0-windows\x64\publish
+      run: dotnet msbuild -restore -t:restore -t:sign -t:pack -p:Configuration=Release -p:Platform=x64
 
     - name: Archive MSIX Package
       run: |
         mkdir -p $GITHUB_WORKSPACE\artifacts
-        mv $GITHUB_WORKSPACE\temp\msix-x64\GreenDragonTranscoder-x64.msix $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-x64.msix
+        mv $GITHUB_WORKSPACE\bin\Release\net8.0-windows\x64\publish\GreenDragonTranscoder.msix $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-x64.msix
 
     # Build .NET MAUI App for ARM64
     - name: Build .NET MAUI App for ARM64
@@ -46,12 +43,12 @@ jobs:
 
     # Package .NET MAUI App as MSIX for ARM64
     - name: Package .NET MAUI App as MSIX for ARM64
-      run: msix pack -d $GITHUB_WORKSPACE\temp\msix-arm64 -p $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-arm64.msix -a arm64 -r $GITHUB_WORKSPACE\bin\Release\net8.0-windows\arm64\publish
+      run: dotnet msbuild -restore -t:restore -t:sign -t:pack -p:Configuration=Release -p:Platform=arm64
 
     - name: Archive MSIX Package for ARM64
       run: |
         mkdir -p $GITHUB_WORKSPACE\artifacts
-        mv $GITHUB_WORKSPACE\temp\msix-arm64\GreenDragonTranscoder-arm64.msix $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-arm64.msix
+        mv $GITHUB_WORKSPACE\bin\Release\net8.0-windows\arm64\publish\GreenDragonTranscoder.msix $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-arm64.msix
 
     - name: Create GitHub Release
       id: create_release
