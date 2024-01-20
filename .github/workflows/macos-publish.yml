@@ -1,0 +1,119 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+
+  macos:
+    needs: release
+    runs-on: macos-latest
+    
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.101
+
+      - name: Restore .NET MAUI Workload
+        run: dotnet workload restore
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build .NET MAUI App for macOS (maccatalyst-${{ matrix.arch }})
+        run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/${{ matrix.arch }} -p:TargetFramework=net8.0-maccatalyst -p:Arch=${{ matrix.arch }}
+
+      - name: Create DMG Package (maccatalyst-${{ matrix.arch }})
+        run: |
+          ls -l $GITHUB_WORKSPACE/build/${{ matrix.arch }}
+          hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/${{ matrix.arch }} -ov -o $GITHUB_WORKSPACE/GreenDragonTranscoder-${{ matrix.arch }}.dmg
+
+      - name: Set DMG Path and Asset Name
+        id: set_dmg
+        run: |
+          dmg_path="${GITHUB_WORKSPACE}/GreenDragonTranscoder-${{ matrix.arch }}.dmg"
+          asset_name="GreenDragonTranscoder-${{ matrix.arch }}.dmg"
+          echo "Absolute Path for ${{ matrix.arch }} DMG: $dmg_path"
+          echo "Asset Name: $asset_name"
+          echo "::set-output name=absolute_path::$dmg_path"
+          echo "::set-output name=asset_name::$asset_name"
+
+      - name: Upload DMG
+        id: upload_dmg
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.set_dmg.outputs.absolute_path }}
+          asset_name: ${{ steps.set_dmg.outputs.asset_name }}
+          asset_content_type: application/x-diskcopy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  windows:
+    needs: release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.101
+
+      - name: Restore .NET MAUI Workload
+        run: dotnet workload restore
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build .NET MAUI App for Windows (x64)
+        run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-windows -p:Arch=x64
+
+      - name: Make MSIX Bundle
+        id: bundler
+        uses: LanceMcCarthy/Action-MsixBundler@v1.0.0
+        with:
+          msix-folder: "$GITHUB_WORKSPACE/build/x64"
+          msixbundle-filepath: "$GITHUB_WORKSPACE/build/GreenDragonTranscoder_x64.msixbundle"
+          msixbundle-version: "1.0.0.0"
+          
+      - name: Verify MSIX Bundle File Path
+        shell: pwsh
+        run: |
+          $path_to_my_msix_bundle = ${{ steps.bundler.outputs.msixbundle_path }}
+          Write-Output $path_to_my_msix_bundle
+
+      - name: Set MSIX Path and Asset Name
+        id: set_msix
+        run: |
+          msix_path="${GITHUB_WORKSPACE}/build/GreenDragonTranscoder_x64.msixbundle"
+          asset_name="GreenDragonTranscoder_x64.msixbundle"
+          echo "Absolute Path for x64 MSIX Bundle: $msix_path"
+          echo "Asset Name: $asset_name"
+          echo "::set-output name=absolute_path_x64::$msix_path"
+          echo "::set-output name=asset_name_x64

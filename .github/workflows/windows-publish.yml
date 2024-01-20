@@ -1,0 +1,89 @@
+name: Windows - Build and Release
+
+on:
+  push:
+    branches:
+      - master1
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 8.0.101
+
+    - name: Install .NET MAUI workloads
+      run: dotnet workload install maui-windows maui-maccatalyst
+      
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    # Build .NET MAUI App for Windows
+    - name: Build .NET MAUI App for Windows
+      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-windows -p:Arch=x64
+
+    # Package .NET MAUI App as MSIX
+    - name: Package .NET MAUI App as MSIX
+      run: dotnet msbuild -restore -t:restore -t:sign -t:pack -p:Configuration=Release -p:Platform=x64
+
+    - name: Archive MSIX Package
+      run: |
+        mkdir -p $GITHUB_WORKSPACE\artifacts
+        mv $GITHUB_WORKSPACE\bin\Release\net8.0-windows\x64\publish\GreenDragonTranscoder.msix $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-x64.msix
+
+    # Build .NET MAUI App for ARM64
+    - name: Build .NET MAUI App for ARM64
+      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-windows -p:Arch=arm64
+
+    # Package .NET MAUI App as MSIX for ARM64
+    - name: Package .NET MAUI App as MSIX for ARM64
+      run: dotnet msbuild -restore -t:restore -t:sign -t:pack -p:Configuration=Release -p:Platform=arm64
+
+    - name: Archive MSIX Package for ARM64
+      run: |
+        mkdir -p $GITHUB_WORKSPACE\artifacts
+        mv $GITHUB_WORKSPACE\bin\Release\net8.0-windows\arm64\publish\GreenDragonTranscoder.msix $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-arm64.msix
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload MSIX Packages
+      id: upload-msix
+      uses: actions/upload-artifact@v2
+      with:
+        name: msix-package
+        path: $GITHUB_WORKSPACE\artifacts\*.msix
+
+    - name: Add MSIX Packages to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-x64.msix
+        asset_name: GreenDragonTranscoder-x64.msix
+        asset_content_type: application/octet-stream
+
+    - name: Add MSIX Packages to Release for ARM64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: $GITHUB_WORKSPACE\artifacts\GreenDragonTranscoder-arm64.msix
+        asset_name: GreenDragonTranscoder-arm64.msix
+        asset_content_type: application/octet-stream
