@@ -7,14 +7,6 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-
-    steps:
-    - name: Create Artifacts Folder
-      run: |
-        mkdir -p $GITHUB_WORKSPACE/build/x64
-        mkdir -p $GITHUB_WORKSPACE/build/arm64
-        mkdir -p $GITHUB_WORKSPACE/artifacts
-        ls -l $GITHUB_WORKSPACE
         
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -34,7 +26,15 @@ jobs:
   
     - name: Restore Dependencies
       run: dotnet restore
- 
+
+     steps:
+    - name: Create Artifacts Folder
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build/x64
+        mkdir -p $GITHUB_WORKSPACE/build/arm64
+        mkdir -p $GITHUB_WORKSPACE
+        ls -l $GITHUB_WORKSPACE
+        
     # Build .NET MAUI App for macOS (maccatalyst-x64)
     - name: Build .NET MAUI App for macOS (maccatalyst-x64)
       run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-maccatalyst -p:Arch=x64
@@ -42,7 +42,7 @@ jobs:
     - name: Create DMG Package (maccatalyst-x64)
       run: |
         ls -l $GITHUB_WORKSPACE/build/x64
-        hdiutil create -format UDZO -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/build/x64 -o $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
+        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/x64 -o $GITHUB_WORKSPACE/GreenDragonTranscoder-x64.dmg
 
     # Build .NET MAUI App for macOS (maccatalyst-arm64)
     - name: Build .NET MAUI App for macOS (maccatalyst-arm64)
@@ -51,7 +51,7 @@ jobs:
     - name: Create DMG Package (maccatalyst-arm64)
       run: |
         ls -l $GITHUB_WORKSPACE/build/arm64
-        hdiutil create -format UDZO -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/build/arm64 -o $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
+        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/arm64 -o $GITHUB_WORKSPACE/GreenDragonTranscoder-arm64.dmg
         
     - name: Create GitHub Release
       id: create_release
@@ -66,7 +66,7 @@ jobs:
 
     - name: Debug - List Artifacts Directory
       run: |
-        ls -l $GITHUB_WORKSPACE/artifacts
+        ls -l $GITHUB_WORKSPACE
 
     - name: Upload DMG Package x64
       id: upload-release-asset-x64
@@ -75,7 +75,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
+        asset_path: $GITHUB_WORKSPACE/GreenDragonTranscoder-x64.dmg
         asset_name: GreenDragonTranscoder-x64.dmg
         asset_content_type: application/octet-stream
 
@@ -86,6 +86,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
+        asset_path: $GITHUB_WORKSPACE/GreenDragonTranscoder-arm64.dmg
         asset_name: GreenDragonTranscoder-arm64.dmg
         asset_content_type: application/octet-stream
