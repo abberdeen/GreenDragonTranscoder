@@ -67,20 +67,6 @@ jobs:
       run: |
         mkdir -p $GITHUB_WORKSPACE/artifacts
         mv $GITHUB_WORKSPACE/temp/dmg-arm64/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
-    
-    - name: Upload x64 DMG Package
-      id: upload-dmg-x64
-      uses: actions/upload-artifact@v2
-      with:
-        name: dmg-package-x64
-        path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
-
-    - name: Upload arm64 DMG Package
-      id: upload-dmg-arm64
-      uses: actions/upload-artifact@v2
-      with:
-        name: dmg-package-arm64
-        path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
 
     - name: Upload DMG Package x64
       id: upload-release-asset-x64
