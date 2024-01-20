@@ -67,25 +67,27 @@ jobs:
     - name: Debug - List Artifacts Directory
       run: |
         ls -l $GITHUB_WORKSPACE
-
+  
     - name: Upload DMG Package x64
       id: upload-release-asset-x64
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        RELEASE_ASSET_PATH: $GITHUB_WORKSPACE/GreenDragonTranscoder-x64.dmg
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/GreenDragonTranscoder-x64.dmg
+        asset_path: ${{ env.RELEASE_ASSET_PATH }}
         asset_name: GreenDragonTranscoder-x64.dmg
         asset_content_type: application/octet-stream
-
+    
     - name: Upload DMG Package arm64
       id: upload-release-asset-arm64
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        RELEASE_ASSET_PATH: $GITHUB_WORKSPACE/GreenDragonTranscoder-arm64.dmg
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/GreenDragonTranscoder-arm64.dmg
+        asset_path: ${{ env.RELEASE_ASSET_PATH }}
         asset_name: GreenDragonTranscoder-arm64.dmg
         asset_content_type: application/octet-stream
