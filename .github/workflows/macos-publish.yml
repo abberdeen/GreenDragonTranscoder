@@ -9,7 +9,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     outputs:
-      id: release_output
+      id: release_output 
+      upload_url: ${{ steps.create_release.outputs.upload_url  }}
     steps:
       - name: Create GitHub Release
         id: create_release
@@ -22,17 +23,11 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Set DMG Path and Asset Name
-        id: set_dmg
-        run: |
-          upload_url="${{ steps.create_release.outputs.upload_url }}" 
-          echo "Upload Url: $upload_url"
-          echo "::set-output name=upload_url::$upload_url"
-          
-      - name: Set Release Upload URL
-        run: echo "RELEASE_UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
+      - name: Print Upload Url
+        run: | 
+          echo "Upload Url: $upload_url" 
 
-  macos:
+  macos_job:
     needs: release
     runs-on: macos-latest
     
@@ -41,22 +36,8 @@ jobs:
         arch: [x64, arm64]
 
     steps:
-
-      - name: Print Release Output in MacOS Job
-        run: echo "RELEASE_OUTPUT=${{ toJson(needs.release.outputs) }}"
-
-      - name: Print RELEASE_UPLOAD_URL in MacOS Job
-        run: echo "${{ needs.release.outputs['release_output.upload_url'] }}"
-        
-      - name: Print RELEASE_UPLOAD_URL in MacOS Job
-        run: echo "RELEASE_UPLOAD_URL=${{ needs.release.outputs.release_output.RELEASE_UPLOAD_URL }}"
- 
-        
-      - name: Print RELEASE_UPLOAD_URL in Release Job
-        run: echo "RELEASE_UPLOAD_URL=${RELEASE_UPLOAD_URL}"
-
-      - name: Print RELEASE_UPLOAD_URL in MacOS Job
-        run: echo "${{ needs.release.outputs }}"
+      - name: Upload Url
+        run: echo "upload_url=${{ needs.release.outputs.upload_url }}" 
         
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -88,27 +69,27 @@ jobs:
           echo "Absolute Path for ${{ matrix.arch }} DMG: $dmg_path"
           echo "Asset Name: $asset_name"
           echo "::set-output name=absolute_path::$dmg_path"
-          echo "::set-output name=asset_name::$asset_name"
-
-      - name: Print RELEASE_UPLOAD_URL
-        run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
-
+          echo "::set-output name=asset_name::$asset_name" 
+          
       - name: Upload DMG
         id: upload_dmg
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ steps.set_dmg.outputs.absolute_path }}
           asset_name: ${{ steps.set_dmg.outputs.asset_name }}
           asset_content_type: application/x-diskcopy
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  windows:
+  windows_job:
     needs: release
     runs-on: windows-latest
 
-    steps:
+    steps:    
+      - name: Upload Url
+        run: echo "upload_url=${{ needs.release.outputs.upload_url }}" 
+        
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -148,16 +129,13 @@ jobs:
           echo "Absolute Path for x64 MSIX Bundle: $msix_path"
           echo "Asset Name: $asset_name"
           echo "::set-output name=absolute_path_x64::$msix_path"
-          echo "::set-output name=asset_name_x64::$asset_name"
-          
-      - name: Print RELEASE_UPLOAD_URL
-        run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
+          echo "::set-output name=asset_name_x64::$asset_name" 
         
       - name: Upload MSIX Bundle
         id: upload_msix
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ steps.set_msix.outputs.absolute_path_x64 }}
           asset_name: ${{ steps.set_msix.outputs.asset_name_x64 }}
           asset_content_type: application/octet-stream
