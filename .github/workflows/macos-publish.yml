@@ -7,7 +7,8 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-        
+    steps:
+    
     - name: Checkout Repository
       uses: actions/checkout@v2
 
@@ -15,7 +16,7 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 8.0.101
-
+        
     - name: Setup xCode latest
       uses: maxim-lobanov/setup-xcode@v1
       with:
@@ -27,7 +28,6 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
 
-     steps:
     - name: Create Artifacts Folder
       run: |
         mkdir -p $GITHUB_WORKSPACE/build/x64
