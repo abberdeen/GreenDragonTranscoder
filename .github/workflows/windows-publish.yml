@@ -18,9 +18,9 @@ jobs:
       with:
         dotnet-version: 8.0.101
 
-    - name: Install .NET MAUI workload for Windows
-      run: dotnet workload install maui-windows
-  
+    - name: Install .NET MAUI workloads
+      run: dotnet workload install maui-windows maui-maccatalyst
+      
     - name: Restore Dependencies
       run: dotnet restore
 
