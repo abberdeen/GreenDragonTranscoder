@@ -110,21 +110,24 @@ jobs:
       - name: Set MSIX Path and Asset Name
         id: set_msix
         run: |
-          msix_folder="${GITHUB_WORKSPACE}/build/x64"
-          msixbundle_filepath="${GITHUB_WORKSPACE}/GreenDragonTranscoder_x64.msixbundle"
-          echo "MSIX Folder: $msix_folder"
-          echo "MSIX Bundle File Path: $msixbundle_filepath"
-          dir $msix_folder 
-          echo "::set-output name=msix_folder::$msix_folder"
-          echo "::set-output name=msixbundle_filepath::$msixbundle_filepath" 
+          $msix_folder = "${env:GITHUB_WORKSPACE}\build\x64"
+          $msixbundle_filepath = "${env:GITHUB_WORKSPACE}\GreenDragonTranscoder_x64.msixbundle"
+          
+          Write-Host "MSIX Folder: $msix_folder"
+          Write-Host "MSIX Bundle File Path: $msixbundle_filepath"
+          
+          Get-ChildItem $msix_folder
+          
+          Write-Output "msix_folder=$msix_folder" >> $env:GITHUB_ENV
+          Write-Output "msixbundle_filepath=$msixbundle_filepath" >> $env:GITHUB_ENV
+
         
       - name: Make MSIX Bundle
         id: bundler
         uses: LanceMcCarthy/Action-MsixBundler@v1.0.0
         with:
           msix-folder: "${{ steps.set_msix.outputs.msix_folder }}"
-          msixbundle-filepath: "${{ steps.set_msix.outputs.msixbundle_filepath }}"
-          msixbundle-version: "1.0.0.0"
+          msixbundle-filepath: "${{ steps.set_msix.outputs.msixbundle_filepath }}" 
           
       - name: Verify MSIX Bundle File Path
         shell: pwsh
