@@ -34,6 +34,10 @@ jobs:
         arch: [x64, arm64]
 
     steps:
+
+      - name: Print Release Output in MacOS Job
+        run: echo "RELEASE_OUTPUT=${{ toJson(needs.release.outputs) }}"
+
       - name: Print RELEASE_UPLOAD_URL in MacOS Job
         run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
         
