@@ -68,6 +68,17 @@ jobs:
         mkdir -p $GITHUB_WORKSPACE/artifacts
         mv $GITHUB_WORKSPACE/temp/dmg-arm64/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
 
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
     - name: Upload DMG Package x64
       id: upload-release-asset-x64
       uses: actions/upload-release-asset@v1
@@ -89,14 +100,3 @@ jobs:
         asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
         asset_name: GreenDragonTranscoder-arm64.dmg
         asset_content_type: application/octet-stream
- 
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      with:
-        tag_name: v${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
-        draft: false
-        prerelease: false
