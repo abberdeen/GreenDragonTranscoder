@@ -28,6 +28,10 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
 
+    - name: Create Artifacts Folder
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/artifacts
+        
     # Build .NET MAUI App for macOS (maccatalyst-x64)
     - name: Build .NET MAUI App for macOS (maccatalyst-x64)
       run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-maccatalyst -p:Arch=x64
