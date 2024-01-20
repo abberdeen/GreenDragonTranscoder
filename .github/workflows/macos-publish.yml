@@ -82,19 +82,28 @@ jobs:
         name: dmg-package-arm64
         path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
 
-    - name: Add DMG Packages to Release
-      id: upload-release-asset
+    - name: Upload DMG Package x64
+      id: upload-release-asset-x64
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: |
-          $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
-          $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
-        asset_name: GreenDragonTranscoder-${{ runner.os }}.dmg
+        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
+        asset_name: GreenDragonTranscoder-x64.dmg
         asset_content_type: application/octet-stream
 
+    - name: Upload DMG Package arm64
+      id: upload-release-asset-arm64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
+        asset_name: GreenDragonTranscoder-arm64.dmg
+        asset_content_type: application/octet-stream
+ 
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
