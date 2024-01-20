@@ -114,9 +114,9 @@ jobs:
           msixbundle_filepath="${GITHUB_WORKSPACE}/GreenDragonTranscoder_x64.msixbundle"
           echo "MSIX Folder: $msix_folder"
           echo "MSIX Bundle File Path: $msixbundle_filepath"
+          dir $msix_folder 
           echo "::set-output name=msix_folder::$msix_folder"
-          echo "::set-output name=msixbundle_filepath::$msixbundle_filepath"
-          ls -l $msix_folder
+          echo "::set-output name=msixbundle_filepath::$msixbundle_filepath" 
         
       - name: Make MSIX Bundle
         id: bundler
