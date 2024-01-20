@@ -11,7 +11,8 @@ jobs:
     steps:
     - name: Create Artifacts Folder
       run: |
-        mkdir -p $GITHUB_WORKSPACE/build/
+        mkdir -p $GITHUB_WORKSPACE/build/x64
+        mkdir -p $GITHUB_WORKSPACE/build/arm64
         mkdir -p $GITHUB_WORKSPACE/artifacts/
         
     - name: Checkout Repository
@@ -35,23 +36,23 @@ jobs:
  
     # Build .NET MAUI App for macOS (maccatalyst-x64)
     - name: Build .NET MAUI App for macOS (maccatalyst-x64)
-      run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build -p:TargetFramework=net8.0-maccatalyst -p:Arch=x64
+      run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-maccatalyst -p:Arch=x64
 
     # Create DMG Package for maccatalyst-x64
     - name: Create DMG Package (maccatalyst-x64)
       run: |
-        ls -l $GITHUB_WORKSPACE/build/bin/Release/net8.0-maccatalyst/maccatalyst-x64
-        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/bin/Release/net8.0-maccatalyst/maccatalyst-x64 -ov $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
+        ls -l $GITHUB_WORKSPACE/build/x64
+        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/x64 -ov $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
 
     # Build .NET MAUI App for macOS (maccatalyst-arm64)
     - name: Build .NET MAUI App for macOS (maccatalyst-arm64)
-      run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build -p:TargetFramework=net8.0-maccatalyst -p:Arch=arm64
+      run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/arm64 -p:TargetFramework=net8.0-maccatalyst -p:Arch=arm64
 
     # Create DMG Package for maccatalyst-arm64
     - name: Create DMG Package (maccatalyst-arm64)
       run: |
-        ls -l $GITHUB_WORKSPACE/build/bin/Release/net8.0-maccatalyst/maccatalyst-arm64
-        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/bin/Release/net8.0-maccatalyst/maccatalyst-arm64 -ov $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
+        ls -l $GITHUB_WORKSPACE/build/arm64
+        hdiutil create -format UDZO -srcfolder $GITHUB_WORKSPACE/build/arm64 -ov $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
 
     - name: Create GitHub Release
       id: create_release
