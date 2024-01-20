@@ -1,0 +1,98 @@
+name: MacOS - Build and Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 8.0.101
+
+    - name: Setup xCode latest
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest
+
+    - name: Install .NET MAUI workload for macOS
+      run: dotnet workload install maui-maccatalyst  
+  
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    # Build .NET MAUI App for macOS (maccatalyst-x64)
+    - name: Build .NET MAUI App for macOS (maccatalyst-x64)
+      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-maccatalyst -p:Arch=x64
+
+    - name: Create Temporary Folder for DMG (maccatalyst-x64)
+      run: mkdir -p $GITHUB_WORKSPACE/temp/dmg-x64
+
+    - name: Create DMG Package (maccatalyst-x64)
+      run: |
+        ls -l /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-x64
+        hdiutil create -format UDRW -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-x64 -ov $GITHUB_WORKSPACE/temp/dmg-x64/output.dmg
+
+    - name: Convert DMG to Read-only (maccatalyst-x64)
+      run: hdiutil convert $GITHUB_WORKSPACE/temp/dmg-x64/output.dmg -format UDZO -o $GITHUB_WORKSPACE/temp/dmg-x64/output-read-only.dmg
+
+    - name: Archive DMG Package (maccatalyst-x64)
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/artifacts
+        mv $GITHUB_WORKSPACE/temp/dmg-x64/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
+
+    # Build .NET MAUI App for macOS (maccatalyst-arm64)
+    - name: Build .NET MAUI App for macOS (maccatalyst-arm64)
+      run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-maccatalyst -p:Arch=arm64
+
+    - name: Create Temporary Folder for DMG (maccatalyst-arm64)
+      run: mkdir -p $GITHUB_WORKSPACE/temp/dmg-arm64
+
+    - name: Create DMG Package (maccatalyst-arm64)
+      run: |
+        ls -l /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-arm64
+        hdiutil create -format UDRW -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-arm64 -ov $GITHUB_WORKSPACE/temp/dmg-arm64/output.dmg
+
+    - name: Convert DMG to Read-only (maccatalyst-arm64)
+      run: hdiutil convert $GITHUB_WORKSPACE/temp/dmg-arm64/output.dmg -format UDZO -o $GITHUB_WORKSPACE/temp/dmg-arm64/output-read-only.dmg
+
+    - name: Archive DMG Package (maccatalyst-arm64)
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/artifacts
+        mv $GITHUB_WORKSPACE/temp/dmg-arm64/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
+ 
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload DMG Package
+      id: upload-dmg
+      uses: actions/upload-artifact@v2
+      with:
+        name: dmg-package
+        path: $GITHUB_WORKSPACE/artifacts/*.dmg
+
+    - name: Add DMG Package to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.dmg
+        asset_name: GreenDragonTranscoder.dmg
+        asset_content_type: application/octet-stream
