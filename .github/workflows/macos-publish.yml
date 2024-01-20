@@ -34,6 +34,21 @@ jobs:
         arch: [x64, arm64]
 
     steps:
+      - name: Print RELEASE_UPLOAD_URL in MacOS Job
+        run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
+        
+      - name: Print RELEASE_UPLOAD_URL in MacOS Job
+        run: echo "${{ release_output.RELEASE_UPLOAD_URL }}"
+
+      - name: Print RELEASE_UPLOAD_URL in MacOS Job
+        run: echo "${{ RELEASE_UPLOAD_URL }}"
+        
+      - name: Print RELEASE_UPLOAD_URL in Release Job
+        run: echo "RELEASE_UPLOAD_URL=${RELEASE_UPLOAD_URL}"
+
+      - name: Print RELEASE_UPLOAD_URL in MacOS Job
+        run: echo "${{ needs.release.outputs }}"
+        
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -100,7 +115,7 @@ jobs:
         run: dotnet restore
 
       - name: Build .NET MAUI App for Windows (x64)
-        run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-windows -p:Arch=x64
+        run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
 
       - name: Make MSIX Bundle
         id: bundler
