@@ -32,7 +32,7 @@ jobs:
       run: |
         mkdir -p $GITHUB_WORKSPACE/build/x64
         mkdir -p $GITHUB_WORKSPACE/build/arm64
-        mkdir -p $GITHUB_WORKSPACE
+        mkdir -p $GITHUB_WORKSPACE/artifacts
         ls -l $GITHUB_WORKSPACE
         
     # Build .NET MAUI App for macOS (maccatalyst-x64)
