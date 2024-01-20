@@ -55,7 +55,6 @@ jobs:
     # Build .NET MAUI App for macOS (maccatalyst-arm64)
     - name: Build .NET MAUI App for macOS (maccatalyst-arm64)
       run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-maccatalyst -p:Arch=arm64
-      working-directory: /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid
 
     - name: Create Temporary Folder for DMG (maccatalyst-arm64)
       run: mkdir -p $GITHUB_WORKSPACE/temp/dmg-arm64
