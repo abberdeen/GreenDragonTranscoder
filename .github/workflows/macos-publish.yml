@@ -102,7 +102,7 @@ jobs:
         run: dotnet workload restore
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore --runtime win-x64
            
       - name: Build .NET MAUI App for Windows (x64)
         run:  dotnet publish -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 --sc --no-restore
