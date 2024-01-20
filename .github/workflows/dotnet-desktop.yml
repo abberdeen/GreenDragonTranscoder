@@ -37,13 +37,18 @@ jobs:
 
     - name: Create DMG Package
       run: |
-        # Add commands to create DMG package for net8.0-maccatalyst here
-        # Example: hdiutil create -format UDRW -srcfolder $GITHUB_WORKSPACE/temp/dmg -ov $GITHUB_WORKSPACE/temp/dmg/output.dmg
+        hdiutil create -format UDRW -srcfolder bin/Release/net8.0-maccatalyst -ov $GITHUB_WORKSPACE/temp/dmg/output.dmg
+
+    - name: Detach DMG
+      run: hdiutil detach "/Volumes/GreenDragonTranscoder" || true
+
+    - name: Convert DMG to Read-only
+      run: hdiutil convert $GITHUB_WORKSPACE/temp/dmg/output.dmg -format UDZO -o $GITHUB_WORKSPACE/temp/dmg/output-read-only.dmg
 
     - name: Archive DMG Package
       run: |
         mkdir -p $GITHUB_WORKSPACE/artifacts
-        mv $GITHUB_WORKSPACE/temp/dmg/*.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.dmg
+        mv $GITHUB_WORKSPACE/temp/dmg/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder.dmg
 
     - name: Build .NET MAUI App for Windows (MSIX)
       run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-windows10.0.19041.0
