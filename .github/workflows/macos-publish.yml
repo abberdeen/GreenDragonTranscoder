@@ -66,6 +66,9 @@ jobs:
           echo "::set-output name=absolute_path::$dmg_path"
           echo "::set-output name=asset_name::$asset_name"
 
+      - name: Print RELEASE_UPLOAD_URL
+        run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
+
       - name: Upload DMG
         id: upload_dmg
         uses: actions/upload-release-asset@v1
