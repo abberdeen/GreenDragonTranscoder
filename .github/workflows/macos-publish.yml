@@ -38,7 +38,7 @@ jobs:
         run: echo "${{ needs.release.outputs['release_output.RELEASE_UPLOAD_URL'] }}"
         
       - name: Print RELEASE_UPLOAD_URL in MacOS Job
-        run: echo "${{ release_output.RELEASE_UPLOAD_URL }}"
+        run: echo "RELEASE_UPLOAD_URL=${{ needs.release.outputs.release_output.RELEASE_UPLOAD_URL }}"
 
       - name: Print RELEASE_UPLOAD_URL in MacOS Job
         run: echo "${{ RELEASE_UPLOAD_URL }}"
