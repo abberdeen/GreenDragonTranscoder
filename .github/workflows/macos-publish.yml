@@ -14,6 +14,7 @@ jobs:
         mkdir -p $GITHUB_WORKSPACE/build/x64
         mkdir -p $GITHUB_WORKSPACE/build/arm64
         mkdir -p $GITHUB_WORKSPACE/artifacts
+        ls -l $GITHUB_WORKSPACE
         
     - name: Checkout Repository
       uses: actions/checkout@v2
