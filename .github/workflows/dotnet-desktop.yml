@@ -37,7 +37,8 @@ jobs:
 
     - name: Create DMG Package
       run: |
-        hdiutil create -format UDRW -srcfolder bin/Release/net8.0-maccatalyst -ov $GITHUB_WORKSPACE/temp/dmg/output.dmg
+        ls -l /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.MauiCore/bin/Release/net8.0-maccatalyst/
+        hdiutil create -format UDRW -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.MauiCore/bin/Release/net8.0-maccatalyst/ -ov $GITHUB_WORKSPACE/temp/dmg/output.dmg
 
     - name: Detach DMG
       run: hdiutil detach "/Volumes/GreenDragonTranscoder" || true
