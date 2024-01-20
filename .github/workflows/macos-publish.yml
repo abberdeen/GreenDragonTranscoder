@@ -32,41 +32,27 @@ jobs:
     - name: Build .NET MAUI App for macOS (maccatalyst-x64)
       run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-maccatalyst -p:Arch=x64
 
-    - name: Create Temporary Folder for DMG (maccatalyst-x64)
-      run: mkdir -p $GITHUB_WORKSPACE/temp/dmg-x64
-
+    # Create DMG Package for maccatalyst-x64
     - name: Create DMG Package (maccatalyst-x64)
       run: |
         ls -l /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-x64
-        hdiutil create -format UDRW -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-x64 -ov $GITHUB_WORKSPACE/temp/dmg-x64/output.dmg
+        hdiutil create -format UDRW -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-x64 -ov $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
 
     - name: Convert DMG to Read-only (maccatalyst-x64)
-      run: hdiutil convert $GITHUB_WORKSPACE/temp/dmg-x64/output.dmg -format UDZO -o $GITHUB_WORKSPACE/temp/dmg-x64/output-read-only.dmg
-
-    - name: Archive DMG Package (maccatalyst-x64)
-      run: |
-        mkdir -p $GITHUB_WORKSPACE/artifacts
-        mv $GITHUB_WORKSPACE/temp/dmg-x64/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
+      run: hdiutil convert $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg -format UDZO -o $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64-read-only.dmg
 
     # Build .NET MAUI App for macOS (maccatalyst-arm64)
     - name: Build .NET MAUI App for macOS (maccatalyst-arm64)
       run: dotnet build -c Release -t:Build -p:TargetFramework=net8.0-maccatalyst -p:Arch=arm64
 
-    - name: Create Temporary Folder for DMG (maccatalyst-arm64)
-      run: mkdir -p $GITHUB_WORKSPACE/temp/dmg-arm64
-
+    # Create DMG Package for maccatalyst-arm64
     - name: Create DMG Package (maccatalyst-arm64)
       run: |
         ls -l /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-arm64
-        hdiutil create -format UDRW -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-arm64 -ov $GITHUB_WORKSPACE/temp/dmg-arm64/output.dmg
+        hdiutil create -format UDRW -srcfolder /Users/runner/work/GreenDragonTranscoder/GreenDragonTranscoder/GreenDragonTranscoder.Hybrid/bin/Release/net8.0-maccatalyst/maccatalyst-arm64 -ov $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
 
     - name: Convert DMG to Read-only (maccatalyst-arm64)
-      run: hdiutil convert $GITHUB_WORKSPACE/temp/dmg-arm64/output.dmg -format UDZO -o $GITHUB_WORKSPACE/temp/dmg-arm64/output-read-only.dmg
-
-    - name: Archive DMG Package (maccatalyst-arm64)
-      run: |
-        mkdir -p $GITHUB_WORKSPACE/artifacts
-        mv $GITHUB_WORKSPACE/temp/dmg-arm64/output-read-only.dmg $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
+      run: hdiutil convert $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg -format UDZO -o $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64-read-only.dmg
 
     - name: Create GitHub Release
       id: create_release
@@ -86,7 +72,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64.dmg
+        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-x64-read-only.dmg
         asset_name: GreenDragonTranscoder-x64.dmg
         asset_content_type: application/octet-stream
 
@@ -97,6 +83,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64.dmg
+        asset_path: $GITHUB_WORKSPACE/artifacts/GreenDragonTranscoder-arm64-read-only.dmg
         asset_name: GreenDragonTranscoder-arm64.dmg
         asset_content_type: application/octet-stream
