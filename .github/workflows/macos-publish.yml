@@ -107,36 +107,36 @@ jobs:
       - name: Build .NET MAUI App for Windows (x64)
         run: dotnet build -c Release -t:Build -o $GITHUB_WORKSPACE/build/x64 -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
 
+      - name: Set MSIX Path and Asset Name
+        id: set_msix
+        run: |
+          msix_folder="${GITHUB_WORKSPACE}/build/x64"
+          msixbundle_filepath="${GITHUB_WORKSPACE}/GreenDragonTranscoder_x64.msixbundle"
+          echo "MSIX Folder: $msix_folder"
+          echo "MSIX Bundle File Path: $msixbundle_filepath"
+          echo "::set-output name=msix_folder::$msix_folder"
+          echo "::set-output name=msixbundle_filepath::$msixbundle_filepath"
+        
       - name: Make MSIX Bundle
         id: bundler
         uses: LanceMcCarthy/Action-MsixBundler@v1.0.0
         with:
-          msix-folder: "$GITHUB_WORKSPACE/build/x64"
-          msixbundle-filepath: "$GITHUB_WORKSPACE/build/GreenDragonTranscoder_x64.msixbundle"
+          msix-folder: "${{ steps.set_msix.outputs.msix_folder }}"
+          msixbundle-filepath: "${{ steps.set_msix.outputs.msixbundle_filepath }}"
           msixbundle-version: "1.0.0.0"
           
       - name: Verify MSIX Bundle File Path
         shell: pwsh
         run: |
           $path_to_my_msix_bundle = ${{ steps.bundler.outputs.msixbundle_path }}
-          Write-Output $path_to_my_msix_bundle
-
-      - name: Set MSIX Path and Asset Name
-        id: set_msix
-        run: |
-          msix_path="${GITHUB_WORKSPACE}/build/GreenDragonTranscoder_x64.msixbundle"
-          asset_name="GreenDragonTranscoder_x64.msixbundle"
-          echo "Absolute Path for x64 MSIX Bundle: $msix_path"
-          echo "Asset Name: $asset_name"
-          echo "::set-output name=absolute_path_x64::$msix_path"
-          echo "::set-output name=asset_name_x64::$asset_name" 
-        
+          Write-Output "MSIX Bundle Path: $path_to_my_msix_bundle"
+          
       - name: Upload MSIX Bundle
         id: upload_msix
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ${{ steps.set_msix.outputs.absolute_path_x64 }}
+          asset_path: ${{ steps.set_msix.outputs.msixbundle_filepath }}
           asset_name: ${{ steps.set_msix.outputs.asset_name_x64 }}
           asset_content_type: application/octet-stream
         env:
