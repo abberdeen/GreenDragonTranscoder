@@ -117,7 +117,7 @@ jobs:
           Write-Output "msixbundle_filepath=$msixbundle_filepath" >> $env:GITHUB_ENV
           
       - name: Build .NET MAUI App for Windows (x64)
-          run: dotnet build -c Release -t:Build -o "${{ steps.set_msix.outputs.msix_folder }}" -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
+        run: dotnet build -c Release -t:Build -o "${{ steps.set_msix.outputs.msix_folder }}" -p:TargetFramework=net8.0-windows10.0.19041.0 -p:Arch=x64
 
       - name: List Files in Directory
         run: |
