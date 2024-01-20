@@ -105,14 +105,14 @@ jobs:
         run: dotnet restore
           
       - name: Build .NET MAUI App for Windows (x64)
-        run:  dotnet publish  ./GreenDragonTranscoder/GreenDragonTranscoder.Hybrid.csproj -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 --sc --no-restore
+        run:  dotnet publish  $GITHUB_WORKSPACE\GreenDragonTranscoder\GreenDragonTranscoder.Hybrid.csproj -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 --sc --no-restore
 
       - name: Find first matching file
         id: findFile
         shell: pwsh
         run: |
           # Define the path pattern
-          $pathPattern = "GreenDragonTranscoder.Hybrid\bin\Release\net*-windows*\*\AppPackages\GreenDragonTranscoder*\GreenDragonTranscoder*.msix"
+          $pathPattern = "$GITHUB_WORKSPACE\GreenDragonTranscoder.Hybrid\bin\Release\net*-windows*\*\AppPackages\GreenDragonTranscoder*\GreenDragonTranscoder*.msix"
   
           # Get the matching files
           $matchingFiles = Get-ChildItem -Path .\ -Recurse -Filter $pathPattern -File
